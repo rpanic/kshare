@@ -6,3 +6,4 @@ gradlew.bat
 settings.gradle
 out/
 .gradle/
+src/main/resources/frontend/monaco/monaco

@@ -1,5 +1,7 @@
 import io.javalin.Javalin
 import io.javalin.websocket.WsSession
+import java.io.File
+import java.nio.file.Files
 
 fun main(args: Array<String>) {
     Main().main();
@@ -13,7 +15,7 @@ class Main{
 
         val app = Javalin.create().apply {
             enableCorsForAllOrigins()
-//            enableStaticFiles("/public")
+            enableStaticFiles("/frontend/monaco")
         }
             .start(8091)
 //        app.get("/") {
@@ -21,10 +23,31 @@ class Main{
 //                "Hello world!"
 //            )
 //        }
-//
-//        app.get("/:name"){
-//            it.result(it.pathParam("name"))
-//        }
+
+        app.get("/:name"){
+//            //it.result(it.pathParam("name"))y
+//            it.header("location: localhost:8091/index.html?q=${it.pathParam("path")}")
+//            it.result("Redirect")
+//            it.result("asd")
+            var name = it.pathParam("name")
+            var path = "src/main/resources/frontend/"
+            if(name.contains(".") || name.startsWith("monaco")){
+                path += name
+            }else{
+                path += "index.html"
+            }
+            if(name.endsWith(".css")) {
+                println("serving css")
+                it.contentType("text/css")
+                it.header("Content-Type", "text/css")
+            }
+            println("Serving $path")
+            try {
+                it.html(Files.readAllLines(File(path).toPath()).joinToString("\n").replace("%123%", name))//.joinToString { "\n" })
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+        }
 
         app.ws("/websocket/:path") { ws ->
             ws.onConnect { session ->
@@ -35,7 +58,7 @@ class Main{
                 println("Connected ${session.pathParam("path")}")
             }
             ws.onMessage { session, message ->
-                println("Received: $message")
+                println("Received: $message from ${session.id}")
 
 //                var split = message.split(" ")
 //
@@ -44,11 +67,12 @@ class Main{
 //                        map.put(session.id, Connection(session, Editor() ))
 //                    }
 //                }
+                map[session.docId]!!.request(message,  session)
 
-                session.remote.sendString("Echo: $message")
+                //session.remote.sendString("Echo: $message")
             }
-            ws.onClose { session, statusCode, reason -> println("Closed") }
-            ws.onError { session, throwable -> println("Errored") }
+            ws.onClose { session, statusCode, reason -> println("Closed") } //TODO remove session from editor
+            ws.onError { session, throwable -> println("Errored: "); throwable?.printStackTrace(); }
         }
 
         println("Init complete")
