@@ -31,7 +31,8 @@
 
         $(window).ready(() => {
             window.editor = editor;
-
+            window.timeoutcount = 0
+            window.timeouts = [0, 1000, 60000]
             initWs();
         })
 

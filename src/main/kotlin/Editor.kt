@@ -12,13 +12,16 @@ class Editor (var name: String) {
         when (split[0]){
 
             "insert" -> {
-                insert(split, session)
+                insert(split, session, s)
             }
             "delete" -> {
                 delete(split, session)
             }
             "init" -> {
                 init(split, session)
+            }
+            "ping" -> {
+                session.remote.sendString("pong")
             }
 
         }
@@ -42,13 +45,15 @@ class Editor (var name: String) {
 
     }
 
-    private fun insert(split: List<String>, session: WsSession) {
+    private fun insert(split: List<String>, session: WsSession, s: String) {
 
         var offset = split[1].toInt()
 
-        text = StringBuilder(text).insert(offset, split[2]).toString()
+        var newtext = s.substring(split[0].length + split[1].length + 2)
 
-        advertiseToAllExcept(session, "ch ${split[1]} ${split[2]}")
+        text = StringBuilder(text).insert(offset, newtext).toString()
+
+        advertiseToAllExcept(session, "ch ${split[1]} ${newtext}")
 
         //session.remote.sendString("true")
 

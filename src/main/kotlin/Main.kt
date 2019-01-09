@@ -22,7 +22,7 @@ class Main{
 //            it.result(
 //                "Hello world!"
 //            )
-//        }
+//        }Abe
 
         app.get("/:name"){
 //            //it.result(it.pathParam("name"))y
@@ -54,11 +54,13 @@ class Main{
                 if(map[session.docId] == null){
                     map[session.docId] = Editor(session.docId)
                 }
+                session.idleTimeout = 1000000
                 map[session.docId]!!.connections.add(Connection(session))
                 println("Connected ${session.pathParam("path")}")
             }
             ws.onMessage { session, message ->
-                println("Received: $message from ${session.id}")
+                if(!message.startsWith("ping"))
+                    println("Received: $message from ${session.id}")
 
 //                var split = message.split(" ")
 //
@@ -72,7 +74,7 @@ class Main{
                 //session.remote.sendString("Echo: $message")
             }
             ws.onClose { session, statusCode, reason -> println("Closed") } //TODO remove session from editor
-            ws.onError { session, throwable -> println("Errored: "); throwable?.printStackTrace(); }
+            ws.onError { session, throwable -> println("Errored: ${throwable?.message}") }
         }
 
         println("Init complete")
