@@ -73,7 +73,16 @@ class Main{
 
                 //session.remote.sendString("Echo: $message")
             }
-            ws.onClose { session, statusCode, reason -> println("Closed") } //TODO remove session from editor
+            ws.onClose { session, statusCode, reason ->
+                println("Closed")
+                var sum = map.values.map { it.connections.size }.sum()
+                map.values.map { it.connections.removeAll{x -> x.ws.id == session.id} }
+                var sumAfter = map.values.map { it.connections.size }.sum()
+                sumAfter = sum - sumAfter
+                if(sumAfter != 1){
+                    println("Removal of connection failed: $sumAfter")
+                }
+            }
             ws.onError { session, throwable -> println("Errored: ${throwable?.message}") }
         }
 

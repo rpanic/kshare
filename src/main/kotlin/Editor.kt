@@ -4,6 +4,7 @@ class Editor (var name: String) {
 
     var connections = ArrayList<Connection>()
     var text = "Write something here"
+    var files = ArrayList<AttachedFile>()
 
     fun request(s: String, session: WsSession){
 
@@ -36,6 +37,7 @@ class Editor (var name: String) {
         text = text.substring(0, offset) + text.substring(offset + length, text.length)
 
         advertiseToAllExcept(session, "del ${split[1]} ${split[2]}")
+        session.remote.sendString("ok")
 
     }
 
@@ -54,6 +56,8 @@ class Editor (var name: String) {
         text = StringBuilder(text).insert(offset, newtext).toString()
 
         advertiseToAllExcept(session, "ch ${split[1]} ${newtext}")
+
+        session.remote.sendString("ok")
 
         //session.remote.sendString("true")
 

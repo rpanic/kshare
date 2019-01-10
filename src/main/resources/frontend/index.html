@@ -1,16 +1,42 @@
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="styles/index.css" media="screen" />
+        <link rel="stylesheet" type="text/css" href="/monaco/Semantic-UI/semantic.min.css">
+        <link rel="stylesheet" type="text/css" href="filedrop.css" media="screen" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     </head>
     <body class="background">
         <div id="container"></div>
+        <!--<div class="fileparent" id="fileDrop">
+            <i class="filecenter fa fa-file-image-o fa-3x image" aria-hidden="true"></i>-->
+
+        <div class="ui two column stackable grid">
+            <div class="six wide column">
+                <div class="fileparent" id="fileDrop">  
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="filecenter">
+                            <input type="file" name="files[]" class="ui secondary button center">
+                            </input>
+                            <input type="submit" value="Upload File" name="submit" class="ui secondary button center">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="ten wide column filelist" id="fileList">
+
+            </div>
+            
+            <div id="files">
+
+            </div>
+        </div>
     </body>
     <script>
         var path = "%123%";
-        
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/monaco/Semantic-UI/semantic.min.js"></script>
     <script src="/monaco/node_modules/monaco-editor/min/vs/loader.js"></script>
     <script>
         require.config({ paths: {'vs': '/monaco/node_modules/monaco-editor/min/vs'}});
@@ -22,7 +48,7 @@
                 '\tconsole.log("Hello world!");',
 				'}'
 			].join('\n')*/,
-			language: 'javascript'
+			language: ''
         });
 
         editor.setValue("Loading...");

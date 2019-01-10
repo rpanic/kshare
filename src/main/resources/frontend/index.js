@@ -1,24 +1,25 @@
 function initWs(){
 
     let split = location.href.split("/");
-    var key = split[split.length - 1];
-    var ws = new WebSocket("ws://localhost:8091/websocket/" + key);
+    let key = split[split.length - 1];
+    let ws = new WebSocket("ws://localhost:8091/websocket/" + key);
     //ws.timeoutcount = window.timeoutcount
     window.ws = ws;
     ws.onclose = (event) => {
-        let timeout = window.timeouts[window.timeoutcount];
+        let timeout = window.timeouts[window.timeoutc];
         console.log("Disconnected - retrying in " + timeout)
         window.timeoutcount++;
+        window.timeoutc++;
         setTimeout((event) => {initWs();}, timeout);
     }
     ws.onopen = (event) => {
         ws.send("init " + key);
         console.log("init " + key);
         ws.onmessage = (event) => {
-            console.log(event);
-            setBlocked(true)
+            window.timeoutc = 0;
+            console.log("Connected")
+            //setBlocked(true)
             window.editor.setValue(event.data);
-            setBlocked(false)
             
             ws.onmessage = remoteChanged;
             if(window.timeoutcount == 0){ //Only once because it is the same all the time and otherwise we send 2 or more times the same to closed websockets
@@ -27,13 +28,15 @@ function initWs(){
                 });
             }
         }
-        ws.o
+        //ws.o
     }
 
-    setInterval(() => {
-        if(window.ws.readyState === window.ws.OPEN)
-            window.ws.send("ping")
-    }, 1000)
+    if(window.timeoutcount == 0){
+        setInterval(() => {
+            if(window.ws.readyState === window.ws.OPEN)
+                window.ws.send("ping")
+        }, 1000)
+    }
 }
 
 function executeIfFree(f){
@@ -58,9 +61,8 @@ function setBlocked(b){
 function onChange(event){
     //console.log(event)
     console.log(event)
-    console.log("got one normal " + blocked)
 
-    if(event.isUndoing === false){
+    if(event.isUndoing === false && event.isFlush === false){
 
         if(window.ws.readyState !== window.ws.OPEN){  //TODO Stehengeblieben beim connect error
             window.editor.getModel().undo();
@@ -77,7 +79,17 @@ function onChange(event){
                     window.ws.send("delete " + element.rangeOffset + " " + element.rangeLength);
                 }else{
                     //Insert
-                    window.ws.send("insert " + element.rangeOffset + " " + element.text);
+
+                    let elementtext = element.text;
+                    /*if(element.rangeLength !== elementtext.length){
+                        elementtext = elementtext.slice(element.rangeLength);
+                        v = window.editor.getValue();
+                        v = v.slice(0, element.rangeOffset + element.rangeLength) + v.slice(element.rangeOffset + element.text.length, v.length);
+                        setBlocked(true);
+                        window.editor.setValue(v);
+                    }*/ //TODO Autocomplete fixen - zurzeit deaktiviert
+
+                    window.ws.send("insert " + element.rangeOffset + " " + elementtext);
                 }
 
             });
@@ -85,13 +97,17 @@ function onChange(event){
             setBlocked(false);
         }
 
+    }else if(event.isFlush){
+        console.log("isFlush");
     }
 
 }
 
 function remoteChanged(event){
 
-    console.log("remoteChanged " + event.data)
+    if(event.data !== "pong"){
+        console.log("remoteChanged " + event.data)
+    }
     let split = event.data.split(" ");
     let v = window.editor.getValue();
     if(split[0] === "ch"){
