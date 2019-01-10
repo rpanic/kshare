@@ -1,7 +1,13 @@
 import io.javalin.Javalin
+import io.javalin.websocket.BinaryMessageHandler
 import io.javalin.websocket.WsSession
+import kotlinx.io.core.String
+import org.apache.commons.io.FileUtils
 import java.io.File
+import java.io.FileOutputStream
+import java.io.FileWriter
 import java.nio.file.Files
+import kotlin.text.StringBuilder
 
 fun main(args: Array<String>) {
     Main().main();
@@ -10,8 +16,13 @@ fun main(args: Array<String>) {
 class Main{
 
     var map = HashMap<String, Editor>()
+    val path = "/filedata/";
+
+    private val writingPath = System.getProperty("user.dir") + "/src/main/resources/frontend/monaco/filedata/"
 
     fun main() {
+
+        println(System.getProperty("user.dir"))
 
         val app = Javalin.create().apply {
             enableCorsForAllOrigins()
@@ -24,6 +35,28 @@ class Main{
 //            )
 //        }Abe
 
+        app.post("/uploadfile"){
+
+            try {
+
+                var key = it.header("key");
+                var editor = map.values.find { e -> e.name == key }!!
+
+                it.uploadedFiles("file").forEach { (contentType, content, name, extension) ->
+
+                    var keyname = key + "_" + name
+
+                    var x = File(writingPath + keyname)
+                    x.createNewFile()
+                    FileUtils.copyInputStreamToFile(content, x)
+
+                    editor.files.add(AttachedFile(x, path + keyname, name))
+
+                }
+                it.html("success")
+            }catch (e: Exception){e.printStackTrace()}
+        }
+
         app.get("/:name"){
 //            //it.result(it.pathParam("name"))y
 //            it.header("location: localhost:8091/index.html?q=${it.pathParam("path")}")
@@ -31,6 +64,7 @@ class Main{
 //            it.result("asd")
             var name = it.pathParam("name")
             var path = "src/main/resources/frontend/"
+
             if(name.contains(".") || name.startsWith("monaco")){
                 path += name
             }else{
@@ -55,9 +89,14 @@ class Main{
                     map[session.docId] = Editor(session.docId)
                 }
                 session.idleTimeout = 1000000
-                map[session.docId]!!.connections.add(Connection(session))
+                map[session.docId]!!.connections.add(Connection(session, map[session.docId]!!))
                 println("Connected ${session.pathParam("path")}")
             }
+//            ws.onMessage{ session, msg, offset, length ->
+//                println("Bytewise onMessage")
+//                var s = String(msg.toByteArray())
+//                println("Converted: $s")
+//            }
             ws.onMessage { session, message ->
                 if(!message.startsWith("ping"))
                     println("Received: $message from ${session.id}")
@@ -69,7 +108,8 @@ class Main{
 //                        map.put(session.id, Connection(session, Editor() ))
 //                    }
 //                }
-                map[session.docId]!!.request(message,  session)
+
+                map[session.docId]!!.request(message, session)
 
                 //session.remote.sendString("Echo: $message")
             }
@@ -83,7 +123,7 @@ class Main{
                     println("Removal of connection failed: $sumAfter")
                 }
             }
-            ws.onError { session, throwable -> println("Errored: ${throwable?.message}") }
+            ws.onError { session, throwable -> println("Errored: ${throwable?.message}"); throwable?.printStackTrace() }
         }
 
         println("Init complete")

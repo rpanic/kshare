@@ -14,19 +14,29 @@ function loadFiles(){
 
 }
 
-const url = 'process.php';
-const form = document.querySelector('form');
-form.addEventListener('submit', selectFile)
-
 function selectFile(event){
-    const file = document.querySelector('[type=file]').files[0];
-    const formData = new FormData();
-    formData.append('file', file);
-    fetch(url, {
-        url: '/uploadFile?k=' + key,
-        method: 'POST',
-        body: formData
-    }).then(response => {
-        console.log(response);
-    });
+
+    var files = document.querySelector('[type=file]').files;
+    if(files.length > 0){
+
+        var file = files[0];
+
+        let split = location.href.split("/");
+        let key = split[split.length - 1];
+
+        const formData = new FormData();
+        formData.append('file', file);
+        //formData.append('key', key);
+        fetch('/uploadfile', {
+            method: 'POST',
+            body: formData,
+            headers: {
+            //    "Content-Type": "multipart/form-data"
+                "key": key
+            }
+        }).then(response => {
+            console.log("Fileupload response: " + response);
+            console.log(response)
+        });
+    }
 }

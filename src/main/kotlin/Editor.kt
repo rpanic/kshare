@@ -24,9 +24,19 @@ class Editor (var name: String) {
             "ping" -> {
                 session.remote.sendString("pong")
             }
+//            "uploadFile" -> {
+//                getConnection(session.id)!!.uploadFile(split, session)
+//            }
+//            "fin" -> {
+//                getConnection(session.id)!!.finishUploading(split, session)
+//            }
 
         }
 
+    }
+
+    fun getConnection(sessionid: String) : Connection?{
+        return connections.find { it.ws.id == sessionid }
     }
 
     private fun delete(split: List<String>, session: WsSession) {

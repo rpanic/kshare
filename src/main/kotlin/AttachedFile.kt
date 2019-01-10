@@ -1,5 +1,5 @@
-class AttachedFile(path: String, name: String) {
+import java.io.File
 
-    val url = "/filestore/";
+class AttachedFile(var path: File, var networkPath: String, var name: String) {
 
 }

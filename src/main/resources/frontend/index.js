@@ -58,13 +58,19 @@ function setBlocked(b){
     }
 }
 
+// var uploading = false
+
+// function setUploading(b){
+//     uploading = b;
+// }
+
 function onChange(event){
     //console.log(event)
     console.log(event)
 
     if(event.isUndoing === false && event.isFlush === false){
 
-        if(window.ws.readyState !== window.ws.OPEN){  //TODO Stehengeblieben beim connect error
+        if(window.ws.readyState !== window.ws.OPEN || uploading){  //TODO Stehengeblieben beim connect error
             window.editor.getModel().undo();
             //TODO Reconnecting Message
             return;

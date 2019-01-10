@@ -1,7 +1,7 @@
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="styles/index.css" media="screen" />
-        <link rel="stylesheet" type="text/css" href="/monaco/Semantic-UI/semantic.min.css">
+        <link rel="stylesheet" type="text/css" href="/Semantic-UI/semantic.min.css">
         <link rel="stylesheet" type="text/css" href="filedrop.css" media="screen" />
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
@@ -14,13 +14,13 @@
         <div class="ui two column stackable grid">
             <div class="six wide column">
                 <div class="fileparent" id="fileDrop">  
-                    <form method="post" enctype="multipart/form-data">
+                    <!--<form method="post" enctype="multipart/form-data" id="fileForm" action="/uploadfile">-->
                         <div class="filecenter">
-                            <input type="file" name="files[]" class="ui secondary button center">
+                            <input type="file" name="file" class="ui secondary button center" multiple>
                             </input>
-                            <input type="submit" value="Upload File" name="submit" class="ui secondary button center">
+                            <button class="ui secondary button center" onClick="selectFile(event);">Submit</button>
+                            <!--<input type="submit" value="Upload File" name="submit" onClick="selectFile(event);" class="ui secondary button center">-->
                         </div>
-                    </form>
                 </div>
             </div>
             <div class="ten wide column filelist" id="fileList">
@@ -36,7 +36,7 @@
         var path = "%123%";
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="/monaco/Semantic-UI/semantic.min.js"></script>
+    <script src="/Semantic-UI/semantic.min.js"></script>
     <script src="/monaco/node_modules/monaco-editor/min/vs/loader.js"></script>
     <script>
         require.config({ paths: {'vs': '/monaco/node_modules/monaco-editor/min/vs'}});
@@ -72,5 +72,6 @@
     }
 
     </script>
+    <script src="loadfiles.js"></script>
     <script src="index.js"></script>
 </html>
