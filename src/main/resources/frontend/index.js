@@ -2,7 +2,7 @@ function initWs(){
 
     let split = location.href.split("/");
     let key = split[split.length - 1];
-    let ws = new WebSocket("ws://localhost:8091/websocket/" + key);
+    let ws = new WebSocket("ws://" + location.host + "/websocket/" + key);
     //ws.timeoutcount = window.timeoutcount
     window.ws = ws;
     ws.onclose = (event) => {
@@ -19,7 +19,9 @@ function initWs(){
             window.timeoutc = 0;
             console.log("Connected")
             //setBlocked(true)
+            let pos = window.editor.getPosition()
             window.editor.setValue(event.data);
+            window.editor.setPosition(pos)
             
             ws.onmessage = remoteChanged;
             if(window.timeoutcount == 0){ //Only once because it is the same all the time and otherwise we send 2 or more times the same to closed websockets
@@ -76,6 +78,7 @@ function onChange(event){
         if(window.ws.readyState !== window.ws.OPEN){  //TODO Stehengeblieben beim connect error
             window.editor.getModel().undo();
             codedUndo = true;
+            console.log("Not open")
             //TODO Reconnecting Message
             return;
         }
@@ -156,4 +159,20 @@ $(window).ready(() => {
     $("[type=file]").hide();
 })
 
+function simulateClick(){
+    $("[type=file]").click()
+}
+
+function fileselectchanged(){
+    var f = document.querySelector("[type=file]").files
+    console.log("fileselectchanged " + f.length)
+    if(f.length > 0){
+        var text = "";
+        if(f.length > 1){
+            text = f.length + " files selected";
+        }else{
+            text = f[0].name;
+        }
+        $("#fakefileselect").html(text)
+    }
 }

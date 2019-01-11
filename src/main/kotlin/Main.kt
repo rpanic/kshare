@@ -4,6 +4,10 @@ import com.squareup.moshi.Types
 import io.javalin.Context
 import io.javalin.Javalin
 import io.javalin.websocket.WsSession
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.nio.file.Files
@@ -19,17 +23,27 @@ class Main{
 
     private val writingPath = System.getProperty("user.dir") + "/src/main/resources/filedata/"
 
+    var numbers = RandomNumbers()
+
     fun main() {
 
         loadEditors()
+
+        numbers.init()
+
+        GlobalScope.launch {
+            while(true){
+                delay(100000L)
+                saveEditors()
+            }
+        }
 
         println(System.getProperty("user.dir"))
 
         val app = Javalin.create().apply {
             enableCorsForAllOrigins()
             enableStaticFiles("/frontend/monaco")
-        }
-            .start(8091)
+        }.start(80/*91*/)
 //        app.get("/") {
 //            it.result(
 //                "Hello world!"
@@ -44,14 +58,16 @@ class Main{
             try {
                 println("filedata")
                 var f = File(writingPath + it.pathParam("name"))
-                if(!f.exists())
+                println(f.absolutePath)
+                if(!f.exists()) {
                     it.result("File ${it.pathParam("name")} not found on our server - go back and try again. \nIf the problem persists contact us")
-                else {
+                }else {
                     it.result(f.inputStream())
                     it.header("Content-Type", "application/download")
                     it.header("Content-Description", "File Transfer")
                     it.header("Content-Length", "${f.totalSpace}")
-                    it.header("Content-Disposition", "attachment; filename=${it.pathParam("name")}")
+                    var name = it.pathParam("name")
+                    it.header("Content-Disposition", "attachment; filename=${name.substring(name.indexOf('_') + 1)}")
                 }
 
             }catch(e: Throwable){e.printStackTrace()}
@@ -90,21 +106,41 @@ class Main{
                     var keyname = key + "_" + name
 
                     var x = File(writingPath + keyname)
-                    x.createNewFile()
-                    FileUtils.copyInputStreamToFile(content, x)
+                    var y = x;
+                    var i = 0;
+                    println(x.absolutePath)
+                    while(y.exists()){
+                        y = File(x.parent + "\\" + x.nameWithoutExtension + i + "." + x.extension);
+                        println(y.absolutePath)
+                        i++;
+                    }
 
-                    editor.files.add(AttachedFile(x.absolutePath, path + keyname, name))
+                    y.createNewFile()
+                    FileUtils.copyInputStreamToFile(content, y)
+
+                    editor.addFile(AttachedFile(y.absolutePath, path + keyname, name))
 
                 }
                 it.html("success")
             }catch (e: Exception){e.printStackTrace()}
         }
 
+        app.get("/"){
+            println("frontpage")
+            it.html(File("src/main/resources/frontend/frontpage.html").readLines().joinToString("\n").replace("%123%", numbers.getNewNumber()))
+        }
+
+
+//        app.wsLogger{x ->
+//            x.onMessage { session, msg -> println("msg $msg") }
+//        }
+
         app.get("/:name"){
 //            //it.result(it.pathParam("name"))y
 //            it.header("location: localhost:8091/index.html?q=${it.pathParam("path")}")
 //            it.result("Redirect")
 //            it.result("asd")
+            println("name")
             var name = it.pathParam("name")
 
             var path = "src/main/resources/frontend/"
@@ -143,7 +179,7 @@ class Main{
 //            }
             ws.onMessage { session, message ->
                 if(!message.startsWith("ping"))
-                    println("Received: $message from ${session.id}")
+                    println("Received: $message")
 
 //                var split = message.split(" ")
 //
@@ -158,7 +194,7 @@ class Main{
                 //session.remote.sendString("Echo: $message")
             }
             ws.onClose { session, statusCode, reason ->
-                println("Closed")
+                println("Closed because: $reason")
                 var sum = map.values.map { it.connections.size }.sum()
                 map.values.map { it.connections.removeAll{x -> x.ws.id == session.id} }
                 var sumAfter = map.values.map { it.connections.size }.sum()

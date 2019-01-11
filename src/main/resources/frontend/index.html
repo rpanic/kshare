@@ -16,19 +16,16 @@
                 <div class="fileparent" id="fileDrop">  
                     <!--<form method="post" enctype="multipart/form-data" id="fileForm" action="/uploadfile">-->
                         <div class="filecenter">
-                            <input type="file" name="file" class="ui secondary button center" multiple>
+                            <p class="ui inverted center small header" style="margin-top: -2em;">Upload Files:</p>
+                            <input type="file" name="file" class="ui secondary button center" onChange="fileselectchanged()" multiple>
                             </input>
-                            <button class="ui secondary button center" onClick="selectFile(event);">Submit</button>
+                            <button class="ui secondary button submit" id="fakefileselect" onClick="simulateClick();">Select File</button>
+                            <button class="ui secondary button submit" onClick="selectFile(event);">Submit</button>
                             <!--<input type="submit" value="Upload File" name="submit" onClick="selectFile(event);" class="ui secondary button center">-->
                         </div>
                 </div>
             </div>
             <div class="ten wide column filelist" id="fileList">
-
-            </div>
-            
-            <div id="files">
-
             </div>
         </div>
     </body>
