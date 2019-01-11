@@ -1,3 +1,6 @@
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import io.javalin.Javalin
 import io.javalin.websocket.BinaryMessageHandler
 import io.javalin.websocket.WsSession
@@ -6,6 +9,7 @@ import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
+import java.lang.reflect.Type
 import java.nio.file.Files
 import kotlin.text.StringBuilder
 
@@ -35,6 +39,27 @@ class Main{
 //            )
 //        }Abe
 
+        app.post("/listfiles"){
+try{
+            var key = it.header("key")
+            var editor = map.values.find { e -> e.name == key }!!;
+
+            var moshi = Moshi.Builder().build()
+
+            var files = editor.files
+
+//            var adapter : JsonAdapter<ArrayList<AttachedFile>> = moshi.adapter(Types.newParameterizedType(files.javaClass, AttachedFile(File(""), "", "").javaClass))
+//
+//            var json = adapter.toJson(files)
+            var adapter : JsonAdapter<AttachedFile> = moshi.adapter(AttachedFile("", "", "").javaClass)
+
+            var s = files.map { adapter.toJson(it) }.map { println(it); it }.joinToString ( ", " )
+            s = "[$s]"
+
+            it.json(s)
+        }catch (e: Exception){e.printStackTrace()}
+        }
+
         app.post("/uploadfile"){
 
             try {
@@ -50,7 +75,7 @@ class Main{
                     x.createNewFile()
                     FileUtils.copyInputStreamToFile(content, x)
 
-                    editor.files.add(AttachedFile(x, path + keyname, name))
+                    editor.files.add(AttachedFile(x.absolutePath, path + keyname, name))
 
                 }
                 it.html("success")

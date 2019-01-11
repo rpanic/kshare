@@ -27,6 +27,7 @@ function initWs(){
                     onChange(event);
                 });
             }
+            loadFiles()
         }
         //ws.o
     }
@@ -70,7 +71,7 @@ function onChange(event){
 
     if(event.isUndoing === false && event.isFlush === false){
 
-        if(window.ws.readyState !== window.ws.OPEN || uploading){  //TODO Stehengeblieben beim connect error
+        if(window.ws.readyState !== window.ws.OPEN){  //TODO Stehengeblieben beim connect error
             window.editor.getModel().undo();
             //TODO Reconnecting Message
             return;

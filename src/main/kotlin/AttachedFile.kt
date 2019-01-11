@@ -1,5 +1,5 @@
 import java.io.File
 
-class AttachedFile(var path: File, var networkPath: String, var name: String) {
+class AttachedFile(@Transient var path: String, var networkPath: String, var name: String) {
 
 }
