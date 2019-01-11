@@ -144,7 +144,16 @@ function remoteChanged(event){
         v = v.slice(0, offset) + v.slice(offset + length, v.length)
         setBlocked(true)
         window.editor.setValue(v);
+    }else if(split[0] === "failed"){
+        codedUndo = true;
+        window.editor.getModel().undo();
+    }else if(split[0] === "rlfiles"){
+        loadFiles()
     }
-   
+}
+
+$(window).ready(() => {
+    $("[type=file]").hide();
+})
 
 }
