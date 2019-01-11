@@ -2,13 +2,31 @@ import io.javalin.websocket.WsSession
 
 class Editor (var name: String) {
 
-    var connections = ArrayList<Connection>()
+    @Transient var connections = ArrayList<Connection>()
     var text = "Write something here"
-    var files = ArrayList<AttachedFile>()
+    @Transient var files = ArrayList<AttachedFile>()
+
+    constructor(name: String, text: String) : this(name){
+        this.text = text
+    }
+
+    fun connections() : ArrayList<Connection>{
+        if(connections == null){
+            connections = ArrayList()
+        }
+        return connections
+    }
+
+    fun files() : ArrayList<AttachedFile>{
+        if(files == null){
+            files = ArrayList()
+        }
+        return files
+    }
 
     fun request(s: String, session: WsSession){
 
-        var split = s.split(" ");
+        var split = s.split(" ")
 
         when (split[0]){
 
@@ -65,7 +83,7 @@ class Editor (var name: String) {
 
         text = StringBuilder(text).insert(offset, newtext).toString()
 
-        advertiseToAllExcept(session, "ch ${split[1]} ${newtext}")
+        advertiseToAllExcept(session, "ch ${split[1]} $newtext")
 
         session.remote.sendString("ok")
 

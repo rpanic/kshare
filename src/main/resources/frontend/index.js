@@ -65,14 +65,17 @@ function setBlocked(b){
 //     uploading = b;
 // }
 
+var codedUndo = false
+
 function onChange(event){
     //console.log(event)
     console.log(event)
 
-    if(event.isUndoing === false && event.isFlush === false){
+    if((event.isUndoing === false || codedUndo === false) && event.isFlush === false){
 
         if(window.ws.readyState !== window.ws.OPEN){  //TODO Stehengeblieben beim connect error
             window.editor.getModel().undo();
+            codedUndo = true;
             //TODO Reconnecting Message
             return;
         }
@@ -106,6 +109,10 @@ function onChange(event){
 
     }else if(event.isFlush){
         console.log("isFlush");
+    }
+
+    if(event.isUndoing && codedUndo){
+        codedUndo = false;
     }
 
 }

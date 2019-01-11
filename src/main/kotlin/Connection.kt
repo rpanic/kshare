@@ -1,6 +1,4 @@
 import io.javalin.websocket.WsSession
-import java.io.File
-import java.io.FileWriter
 
 class Connection(var ws: WsSession, var editor: Editor){
 
@@ -8,7 +6,7 @@ class Connection(var ws: WsSession, var editor: Editor){
         ws.remote.sendString(s)
     }
 
-    val path = "/filedata/";
+    val path = "/filedata/"
 //    private val writingPath = "/resources/frontend/monaco/filedata/"
 
 //    var currentlyUploading = false

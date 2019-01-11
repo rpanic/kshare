@@ -1,9 +1,10 @@
-import io.kweb.*;
-import io.kweb.dom.element.creation.tags.*
+import io.kweb.Kweb
+import io.kweb.dom.element.creation.tags.a
+import io.kweb.dom.element.creation.tags.button
+import io.kweb.dom.element.creation.tags.textArea
 import io.kweb.dom.element.events.on
 import io.kweb.dom.element.new
 import io.kweb.state.KVar
-import io.kweb.state.persistent.logger
 
 fun main(args: Array<String>) {
 
