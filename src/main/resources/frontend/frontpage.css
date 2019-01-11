@@ -1,0 +1,17 @@
+#main{
+
+    margin: 10% 10%;
+
+}
+
+body > .grid{
+    height: 98%;
+}
+.column{
+    max-width: 1000px;
+}
+.main h1.ui.header {
+    margin-bottom: 0em;
+    font-size: 3em;
+    font-weight: normal;
+}
