@@ -9,8 +9,14 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
+import java.io.BufferedInputStream
 import java.io.File
-import java.nio.file.Files
+import java.net.URISyntaxException
+import java.nio.file.*
+import java.util.*
+import java.util.jar.JarFile
+import java.util.stream.Stream
 
 fun main() {
     Main().main()
@@ -23,11 +29,13 @@ class Main{
 
     private val writingPath = System.getProperty("user.dir") + "/filedata/"
 
-    private val devPath = "src/main/resources/";
+    private val devPath = ""//""src/main/resources/";
 
     var numbers = RandomNumbers()
 
     fun main() {
+
+        extractResource("frontend")
 
         loadEditors()
 
@@ -45,6 +53,7 @@ class Main{
         val app = Javalin.create().apply {
             enableCorsForAllOrigins()
             enableStaticFiles("/frontend/monaco")
+
         }.start(80/*91*/)
 //        app.get("/") {
 //            it.result(
@@ -216,6 +225,58 @@ class Main{
 
     }
 
+    fun extractResource(path: String) {
+
+        var root = File(userdir() + "/frontend")
+        if(root.isDirectory && root.exists()){
+            return;
+        }
+
+        val jarFile = File(javaClass.protectionDomain.codeSource.location.path)
+
+        if (jarFile.isFile()) {  // Run with JAR file
+            val jar = JarFile(jarFile)
+            val entries = jar.entries() //gives ALL entries in jar
+            while (entries.hasMoreElements()) {
+                val name = entries.nextElement().getName()
+                if (name.startsWith("$path/")) { //filter according to the path
+                    var split = name.split("/")
+                    if(split[split.lastIndex].contains(".")){
+                        var inst = Main::class.java.getResourceAsStream(name)
+                        println("extracting $name...")
+                        var f =  File(userdir() + "/" + name)
+                        if(!f.parentFile.exists())
+                            f.parentFile.mkdirs()
+                        f.createNewFile()
+                        f.writeBytes(BufferedInputStream(inst).readBytes())
+                    }
+                }
+            }
+            jar.close()
+        } //else { // Run with IDE
+//            val url = Main::class.java.getResource("/$path")
+//            if (url != null) {
+//                try {
+//                    val apps = File(url.toURI())
+//                    for (app in apps.listFiles()) {
+//                        System.out.println(app)
+//                        if (app.isDirectory) {
+//                            extractResource(path + "/" + app.name)
+//                        } else {
+//                            if(!app.parentFile.exists())
+//                                app.parentFile.mkdir()
+//
+//                            File(app.path).writeBytes(app.readBytes())
+//                        }
+//                    }
+//                } catch (ex: URISyntaxException) {
+//                    // never happens
+//                }
+//
+//            }
+//        }
+    }
+
     val savePath = userdir() + "/save.csv"
 
     fun saveEditors(){
@@ -250,7 +311,7 @@ class Main{
                     fileDirectory.mkdirs()
                 fileDirectory.listFiles { f -> f.name.startsWith(it.name) }
                         .map { f -> AttachedFile(f.absolutePath, path + f.name, f.name.substring(it.name.length + 1)) }
-                        .forEach{ f -> it.files.add(f)}
+                        .forEach{ f -> it.files().add(f)}
 
             }
         }

@@ -2,19 +2,40 @@ import io.javalin.websocket.WsSession
 
 class Editor (var name: String) {
 
-    @delegate:Transient val connections: ArrayList<Connection> by lazy{ArrayList<Connection>()}
+    @Transient var connections = ArrayList<Connection>()
     var text = "Write something here"
-    @delegate:Transient val files: ArrayList<AttachedFile> by lazy{ArrayList<AttachedFile>()}
+    @Transient var files = ArrayList<AttachedFile>()
     var lastUsed = 0L
-    @delegate:Transient val rlFileList: ArrayList<String> by lazy{ArrayList<String>()}
+    @Transient var rlFileList = ArrayList<String>()
 
     constructor(name: String, text: String) : this(name){
         this.text = text
     }
 
+    fun connections() : ArrayList<Connection>{
+        if(connections == null){
+            connections = ArrayList()
+        }
+        return connections
+    }
+
+    fun files() : ArrayList<AttachedFile>{
+        if(files == null){
+            files = ArrayList()
+        }
+        return files
+    }
+
+    fun rlFileList() : ArrayList<String>{
+        if(rlFileList == null){
+            rlFileList = ArrayList()
+        }
+        return rlFileList
+    }
+
     fun addFile(file: AttachedFile){
-        files.add(file)
-        rlFileList.addAll(connections.filter { it.ws.isOpen }.map { it.ws.id })
+        files().add(file)
+        rlFileList().addAll(connections.filter { it.ws.isOpen }.map { it.ws.id })
     }
 
     fun request(s: String, session: WsSession){
@@ -32,9 +53,9 @@ class Editor (var name: String) {
             "init" -> init(split, session)
 
             "ping" -> {
-                if (rlFileList.contains(session.id)) {
+                if (rlFileList().contains(session.id)) {
                     session.remote.sendString("rlfiles")
-                    rlFileList.remove(session.id)
+                    rlFileList().remove(session.id)
                 } else
                     session.remote.sendString("pong")
             }
