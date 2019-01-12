@@ -94,8 +94,6 @@ class Editor (var name: String) {
 
         session.remote.sendString("ok")
 
-        //session.remote.sendString("true")
-
     }
 
     private fun advertiseToAllExcept(session: WsSession, s: String){

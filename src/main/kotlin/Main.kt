@@ -1,6 +1,7 @@
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import io.javalin.Context
 import io.javalin.Javalin
 import io.javalin.websocket.WsSession
 import kotlinx.coroutines.GlobalScope
@@ -9,8 +10,7 @@ import kotlinx.coroutines.launch
 import org.apache.commons.io.FileUtils
 import java.io.BufferedInputStream
 import java.io.File
-import java.net.URISyntaxException
-import java.nio.file.*
+import java.nio.file.Files
 import java.util.*
 import java.util.jar.JarFile
 
@@ -25,7 +25,7 @@ class Main{
 
     private val writingPath = System.getProperty("user.dir") + "/filedata/"
 
-    private val devPath = "src/main/resources/";
+    private val devPath = ""//""src/main/resources/"
 
     var numbers = RandomNumbers()
 
@@ -59,33 +59,23 @@ class Main{
             enableStaticFiles("/frontend/monaco")
 
         }.start(port)
-//        app.get("/") {
-//            it.result(
-//                "Hello world!"
-//            )
-//        }Aber
 
         app.get("/filedata/:name"){
 
-//            if(name.startsWith("filedata")){
-//                println("FIledata $name")
-//            }
-            try {
-                println("filedata")
-                var f = File(writingPath + it.pathParam("name"))
-                println(f.absolutePath)
-                if(!f.exists()) {
-                    it.result("File ${it.pathParam("name")} not found on our server - go back and try again. \nIf the problem persists contact us")
-                }else {
-                    it.result(f.inputStream())
-                    it.header("Content-Type", "application/download")
-                    it.header("Content-Description", "File Transfer")
-                    it.header("Content-Length", "${f.totalSpace}")
-                    var name = it.pathParam("name")
-                    it.header("Content-Disposition", "attachment; filename=${name.substring(name.indexOf('_') + 1)}")
-                }
+            sendFile(it.pathParam("name"), it)
 
-            }catch(e: Throwable){e.printStackTrace()}
+        }
+
+        app.post("getfile"){
+
+            var key = it.header("key")
+            var file = it.header("filename")
+            var path = it.header("path")
+            if(path != null){
+                sendFile(path, it)
+            }else if(key != null && file != null)
+                sendFile("${key}_{$file}", it)
+
         }
 
         app.post("/listfiles"){
@@ -97,13 +87,8 @@ class Main{
 
             var files = editor.files
 
-//            var adapter : JsonAdapter<ArrayList<AttachedFile>> = moshi.adapter(Types.newParameterizedType(files.javaClass, AttachedFile(File(""), "", "").javaClass))
-//
-//            var json = adapter.toJson(files)
             var adapter : JsonAdapter<AttachedFile> = moshi.adapter(AttachedFile::class.java)
 
-//            var s = files.map { adapter.toJson(it) }.map { println(it); it }.joinToString ( ", " )
-//            s = "[$s]"
             var s = files.map { adapter.toJson(it) }.toJsonArray()
 
             it.json(s)
@@ -184,26 +169,13 @@ class Main{
                 map[session.docId]!!.connections.add(Connection(session, map[session.docId]!!))
                 println("Connected ${session.pathParam("path")}")
             }
-//            ws.onMessage{ session, msg, offset, length ->
-//                println("Bytewise onMessage")
-//                var s = String(msg.toByteArray())
-//                println("Converted: $s")
-//            }
+
             ws.onMessage { session, message ->
                 if(!message.startsWith("ping"))
                     println("Received: $message")
 
-//                var split = message.split(" ")
-//
-//                when (split[0]) {
-//                    "init" -> {
-//                        map.put(session.id, Connection(session, Editor() ))
-//                    }
-//                }
 
                 map[session.docId]!!.request(message, session)
-
-                //session.remote.sendString("Echo: $message")
             }
             ws.onClose { session, statusCode, reason ->
                 println("Closed because: $reason")
@@ -227,6 +199,26 @@ class Main{
             }
         }
 
+    }
+
+    fun sendFile(filename: String, c: Context) = c.also {
+        try {
+
+            println("filedata")
+            var f = File(writingPath + filename)
+
+            if(!f.exists()) {
+                it.result("File ${it.pathParam("name")} not found on our server - go back and try again. \nIf the problem persists contact us")
+            }else {
+                it.result(f.inputStream())
+                it.header("Content-Type", "application/download")
+                it.header("Content-Description", "File Transfer")
+                it.header("Content-Length", "${f.totalSpace}")
+                var name = it.pathParam("name")
+                it.header("Content-Disposition", "attachment; filename=${name.substring(name.indexOf('_') + 1)}")
+            }
+
+        }catch(e: Throwable){e.printStackTrace()}
     }
 
     fun extractResource(path: String) {
@@ -285,8 +277,6 @@ class Main{
 
     fun saveEditors(){
 
-//        var text = map.values.map { it.name + ";" + it.text }.joinToString("\n")
-//        File(savePath).writeText(text)
         var adapter = Moshi.Builder().build().adapter<Editor>(Editor::class.java)
         var arr = map.values.map { adapter.toJson(it) }.map { println(it); it }.toJsonArray()
 

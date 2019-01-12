@@ -1,5 +1,6 @@
 # kShare
-kShare is a real-time live code and file sharing platform
+
+#### kShare is a real-time code and file sharing platform
 
 - Backend written in Kotlin with [javalin](javalin.io)
 - built-in [monaco](https://microsoft.github.io/monaco-editor/) editor
@@ -42,7 +43,7 @@ Therefore there are only 3 endpoints
 - `uploadFile: Uploads one or multiple files`
 - `fileData: retrieves a file`
 
-**listFiles**
+**listfiles**
 
 `POST: kshare.me/listFiles`
 
@@ -60,16 +61,24 @@ Sample Result:
 
 **uploadFile**
 
-`POST: kshare.io/uploadFile`
+`POST: kshare.me/uploadFile`
 
 Parameters: 
-- key (header): Specifies the key to which the file was saved. 
+- key (header): Specifies the key to which the file should be saved.
 - file (body): The data of the file being uploaded 
 
 Result: \
 `ok:` If the upload was successful \
 `failed:` There were problems or your request was wrong
 
-**getFile**\
-Coming soon
+**getFile**
+
+`POST: kshare.me/getfile`
+
+Parameters:
+- key (header): Specifies the key to which the file was saved.
+- filename (header): The name of the file saved
+
+Result: \
+A data stream of the files data
 

@@ -1,6 +1,5 @@
 import io.kweb.shoebox.toArrayList
 import java.io.File
-import kotlin.random.Random
 
 class RandomNumbers{
 
