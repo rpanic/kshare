@@ -1,25 +1,21 @@
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import io.javalin.Context
 import io.javalin.Javalin
 import io.javalin.websocket.WsSession
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.apache.commons.io.FileUtils
-import org.apache.commons.io.IOUtils
 import java.io.BufferedInputStream
 import java.io.File
 import java.net.URISyntaxException
 import java.nio.file.*
 import java.util.*
 import java.util.jar.JarFile
-import java.util.stream.Stream
 
-fun main() {
-    Main().main()
+fun main(args: Array<String>) {
+    Main().main(args)
 }
 
 class Main{
@@ -29,11 +25,19 @@ class Main{
 
     private val writingPath = System.getProperty("user.dir") + "/filedata/"
 
-    private val devPath = ""//""src/main/resources/";
+    private val devPath = "src/main/resources/";
 
     var numbers = RandomNumbers()
 
-    fun main() {
+    fun main(args: Array<String>) {
+
+        var port = 80;
+
+        if(args.size > 1){
+            if(args[0].startsWith("-p")){
+                port = args[1].toIntOrNull() ?: port
+            }
+        }
 
         extractResource("frontend")
 
@@ -54,7 +58,7 @@ class Main{
             enableCorsForAllOrigins()
             enableStaticFiles("/frontend/monaco")
 
-        }.start(80/*91*/)
+        }.start(port)
 //        app.get("/") {
 //            it.result(
 //                "Hello world!"
