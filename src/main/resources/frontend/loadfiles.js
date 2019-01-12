@@ -3,6 +3,8 @@ function loadFiles(){
     let split = location.href.split("/");
     let key = split[split.length - 1];
 
+// **** List Files ****
+
     $.ajax({
         url: '/listfiles',
         beforeSend: function(request) {
@@ -19,29 +21,6 @@ function loadFiles(){
             console.log(error);
         }
     });
-
-    // fetch('/listfiles', {
-    //     method: 'POST',
-    //     headers: {
-    //         "key": key
-    //     }
-    // }).then(response => {
-    //     response.json();
-    // }).then(json => {
-    //     console.log(JSON.stringify(json));
-    //     if(json !== undefined){
-    //         console.log(json)
-    //         $("#fileList").html('');
-    //         json.forEach(element => {
-    //             var x = '<div class="ui secondary segment filecont">';
-    //             x += '<a href="' + element.href + '">' + element.name + '</a>';
-    //             x += '</div>';
-    //             $("#fileList").append(x);
-    //         });
-    //     }else{
-    //         console.log("Json undefined")
-    //     }
-    // });
 
 }
 
@@ -72,14 +51,14 @@ function selectFile(event){
             let split = location.href.split("/");
             let key = split[split.length - 1];
 
+// **** Uploading File ****
+
             const formData = new FormData();
             formData.append('file', file);
-            //formData.append('key', key);
             fetch('/uploadfile', {
                 method: 'POST',
                 body: formData,
                 headers: {
-                //    "Content-Type": "multipart/form-data"
                     "key": key
                 }
             }).then(response => {
