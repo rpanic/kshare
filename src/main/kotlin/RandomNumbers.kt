@@ -23,7 +23,7 @@ class RandomNumbers{
         var s = ""
 
         while(s.length < length)
-            s += ('a'..('a' + 26)).random()
+            s += ('a'..('a' + 25)).random()
 
         usedNumbers.add(s)
         save()

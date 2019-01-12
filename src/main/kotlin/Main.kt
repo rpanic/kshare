@@ -12,7 +12,7 @@ import org.apache.commons.io.FileUtils
 import java.io.File
 import java.nio.file.Files
 
-fun main(args: Array<String>) {
+fun main() {
     Main().main()
 }
 
@@ -21,7 +21,9 @@ class Main{
     var map = HashMap<String, Editor>()
     val path = "/filedata/"
 
-    private val writingPath = System.getProperty("user.dir") + "/src/main/resources/filedata/"
+    private val writingPath = System.getProperty("user.dir") + "/filedata/"
+
+    private val devPath = "src/main/resources/";
 
     var numbers = RandomNumbers()
 
@@ -80,12 +82,12 @@ class Main{
 
             var moshi = Moshi.Builder().build()
 
-            var files = editor.files()
+            var files = editor.files
 
 //            var adapter : JsonAdapter<ArrayList<AttachedFile>> = moshi.adapter(Types.newParameterizedType(files.javaClass, AttachedFile(File(""), "", "").javaClass))
 //
 //            var json = adapter.toJson(files)
-            var adapter : JsonAdapter<AttachedFile> = moshi.adapter(AttachedFile("", "", "").javaClass)
+            var adapter : JsonAdapter<AttachedFile> = moshi.adapter(AttachedFile::class.java)
 
 //            var s = files.map { adapter.toJson(it) }.map { println(it); it }.joinToString ( ", " )
 //            s = "[$s]"
@@ -99,9 +101,9 @@ class Main{
             try {
 
                 var key = it.header("key")
-                var editor = map.values.find { e -> e.name == key }!!
+                var editor = map.values.find { e -> e.name == key }!!  //TODO Nullpointer
 
-                it.uploadedFiles("file").forEach { (contentType, content, name, extension) ->
+                it.uploadedFiles("file").forEach { (_, content, name, _) ->
 
                     var keyname = key + "_" + name
 
@@ -110,9 +112,13 @@ class Main{
                     var i = 0;
                     println(x.absolutePath)
                     while(y.exists()){
-                        y = File(x.parent + "\\" + x.nameWithoutExtension + i + "." + x.extension);
+                        y = File("${x.parent}\\${x.nameWithoutExtension}$i.${x.extension}");
                         println(y.absolutePath)
                         i++;
+                    }
+
+                    if(!x.parentFile.exists()){
+                        x.parentFile.mkdirs()
                     }
 
                     y.createNewFile()
@@ -127,23 +133,15 @@ class Main{
 
         app.get("/"){
             println("frontpage")
-            it.html(File("src/main/resources/frontend/frontpage.html").readLines().joinToString("\n").replace("%123%", numbers.getNewNumber()))
+            it.html(File("${devPath}frontend/frontpage.html").readLines().joinToString("\n").replace("%123%", numbers.getNewNumber()))
         }
 
+        app.get("/:name"){ //TODO monaco folder einzeln
 
-//        app.wsLogger{x ->
-//            x.onMessage { session, msg -> println("msg $msg") }
-//        }
-
-        app.get("/:name"){
-//            //it.result(it.pathParam("name"))y
-//            it.header("location: localhost:8091/index.html?q=${it.pathParam("path")}")
-//            it.result("Redirect")
-//            it.result("asd")
             println("name")
             var name = it.pathParam("name")
 
-            var path = "src/main/resources/frontend/"
+            var path = "${devPath}frontend/"
 
             if(name.contains(".") || name.startsWith("monaco")){
                 path += name
@@ -157,7 +155,8 @@ class Main{
             }
             println("Serving $path")
             try {
-                it.html(Files.readAllLines(File(path).toPath()).joinToString("\n").replace("%123%", name))//.joinToString { "\n" })
+                var s = Files.readAllLines(File(path).toPath()).joinToString("\n").replace("%123%", name)  //TODO Replace nur bei html oder so
+                it.html(s)//.joinToString { "\n" })
             }catch (e: Exception){
                 e.printStackTrace()
             }
@@ -169,7 +168,7 @@ class Main{
                     map[session.docId] = Editor(session.docId)
                 }
                 session.idleTimeout = 1000000
-                map[session.docId]!!.connections().add(Connection(session, map[session.docId]!!))
+                map[session.docId]!!.connections.add(Connection(session, map[session.docId]!!))
                 println("Connected ${session.pathParam("path")}")
             }
 //            ws.onMessage{ session, msg, offset, length ->
@@ -217,7 +216,7 @@ class Main{
 
     }
 
-    val savePath = System.getProperty("user.dir") + "/save.csv"
+    val savePath = userdir() + "/save.csv"
 
     fun saveEditors(){
 
@@ -247,24 +246,20 @@ class Main{
                 map[it.name] = it
 
                 var fileDirectory = File(writingPath)
+                if(!fileDirectory.exists())
+                    fileDirectory.mkdirs()
                 fileDirectory.listFiles { f -> f.name.startsWith(it.name) }
                         .map { f -> AttachedFile(f.absolutePath, path + f.name, f.name.substring(it.name.length + 1)) }
-                        .forEach{ f -> it.files().add(f)}
+                        .forEach{ f -> it.files.add(f)}
 
             }
         }
-
-//        lines.forEach {
-//            var split = it.split(";")
-//            map[split[0]] = Editor(split[0])
-//            map[split[0]]!!.text = split[1]
-//        }
-
     }
 
     fun Iterable<String>.toJsonArray() =
         "[${this.joinToString(", ")}]"
 
+    fun userdir() = System.getProperty("user.dir")
 
     val WsSession.docId: String get() = this.pathParam("path")
 
