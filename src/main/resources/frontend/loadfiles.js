@@ -31,13 +31,27 @@ function useFileJson(json){
         $("#fileList").html('');
         json.forEach(element => {
             var x = '<div class="ui secondary segment filecont">';
-            x += '<a href="' + element.networkPath + '" target="blank">' + element.name + '</a>';
-            x += '</div>';
+            x += '<div><a href="' + element.networkPath + '" target="blank" class="sfn ls">' + element.name + "</a>";
+            x += '<a href="' + element.networkPath + '" class="ui secondary button submit sfn ls" style="float: right; margin-top: -0.6em;">Open</a>';
+            x += '<a onClick="copyPath(\'' + url + escape(element.networkPath) + '\');" class="ui secondary button submit sfn ls" style="float: right; margin-top: -0.6em;">Copy Link</button>';
+            x+= '';
+            x += '</div></div>';
             $("#fileList").append(x);
         });
     }else{
         console.log("Json undefined")
     }
+}
+
+function copyPath(path){
+
+    var x = document.createElement('textarea');
+    x.value = path;
+    document.body.appendChild(x);
+    x.select();
+    document.execCommand('copy');
+    document.body.removeChild(x);
+
 }
 
 function selectFile(event){

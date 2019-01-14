@@ -19,7 +19,7 @@
                             <!--<p class="ui inverted center small header">Upload Files:</p>-->
                             <input type="file" name="file" class="ui secondary button center" onChange="/*fileselectchanged();*/ selectFile(event);" multiple>
                             </input>
-                            <button class="ui secondary button submit" id="fakefileselect" onClick="simulateClick();">Select and Upload File</button>
+                            <button class="ui secondary button submit sfn" style="letter-spacing: 1rm;" id="fakefileselect" onClick="simulateClick();">Select and Upload File</button>
                             <!--<button class="ui secondary button submit" onClick="selectFile(event);">Submit</button>-->
                             <!--<input type="submit" value="Upload File" name="submit" onClick="selectFile(event);" class="ui secondary button center">-->
                         </div>
@@ -37,6 +37,7 @@
     </body>
     <script>
         var path = "%123%";
+        var url = "%url%";
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/Semantic-UI/semantic.min.js"></script>
