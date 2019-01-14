@@ -156,7 +156,10 @@ class Main{
                 if(name == "favicon.ico"){
                     it.result(File(path).inputStream())
                 }else {
-                    var s = Files.readAllLines(File(path).toPath()).joinToString("\n").replace("%123%", name)  //TODO Replace nur bei html oder so
+                    var s = Files.readAllLines(File(path).toPath()).joinToString("\n")
+                    if(name.endsWith(".html")){
+                        s = s.replace("%123%", name)
+                    }
                     it.html(s)//.joinToString { "\n" })
                 }
             }catch (e: Exception){
