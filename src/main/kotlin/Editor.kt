@@ -5,7 +5,7 @@ class Editor (var name: String) {
     @Transient var connections = ArrayList<Connection>()
     var text = "Write something here"
     @Transient var files = ArrayList<AttachedFile>()
-    var lastUsed = 0L
+    private var lastUsed = 0L
     @Transient var rlFileList = ArrayList<String>()
 
     constructor(name: String, text: String) : this(name){

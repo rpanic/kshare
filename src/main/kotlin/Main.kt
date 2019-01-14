@@ -31,7 +31,7 @@ class Main{
 
     fun main(args: Array<String>) {
 
-        var port = 80;
+        var port = 80
 
         if(args.size > 1){
             if(args[0].startsWith("-p")){
@@ -89,7 +89,7 @@ class Main{
 
             var adapter : JsonAdapter<AttachedFile> = moshi.adapter(AttachedFile::class.java)
 
-            var s = files.map { adapter.toJson(it) }.toJsonArray()
+            var s = files.map { f -> adapter.toJson(f) }.toJsonArray()
 
             it.json(s)
         }
@@ -106,13 +106,13 @@ class Main{
                     var keyname = key + "_" + name
 
                     var x = File(writingPath + keyname)
-                    var y = x;
-                    var i = 0;
+                    var y = x
+                    var i = 0
                     println(x.absolutePath)
                     while(y.exists()){
-                        y = File("${x.parent}\\${x.nameWithoutExtension}$i.${x.extension}");
+                        y = File("${x.parent}\\${x.nameWithoutExtension}$i.${x.extension}")
                         println(y.absolutePath)
-                        i++;
+                        i++
                     }
 
                     if(!x.parentFile.exists()){
@@ -141,10 +141,10 @@ class Main{
 
             var path = "${devPath}frontend/"
 
-            if(name.contains(".") || name.startsWith("monaco")){
-                path += name
+            path += if(name.contains(".") || name.startsWith("monaco")){
+                name
             }else{
-                path += "index.html"
+                "index.html"
             }
             if(name.endsWith(".css")) {
                 println("serving css")
@@ -153,7 +153,7 @@ class Main{
             }
             println("Serving $path")
             try {
-                if(name.equals("favicon.ico")){
+                if(name == "favicon.ico"){
                     it.result(File(path).inputStream())
                 }else {
                     var s = Files.readAllLines(File(path).toPath()).joinToString("\n").replace("%123%", name)  //TODO Replace nur bei html oder so
@@ -205,7 +205,7 @@ class Main{
 
     }
 
-    fun sendFile(filename: String, c: Context) = c.also {
+    private fun sendFile(filename: String, c: Context) = c.also {
         try {
 
             println("filedata")
@@ -229,16 +229,16 @@ class Main{
 
         var root = File(userdir() + "/frontend")
         if(root.isDirectory && root.exists()){
-            return;
+            return
         }
 
         val jarFile = File(javaClass.protectionDomain.codeSource.location.path)
 
-        if (jarFile.isFile()) {  // Run with JAR file
+        if (jarFile.isFile) {  // Run with JAR file
             val jar = JarFile(jarFile)
             val entries = jar.entries() //gives ALL entries in jar
             while (entries.hasMoreElements()) {
-                val name = entries.nextElement().getName()
+                val name = entries.nextElement().name
                 if (name.startsWith("$path/")) { //filter according to the path
                     var split = name.split("/")
                     if(split[split.lastIndex].contains(".")){
@@ -318,7 +318,7 @@ class Main{
     fun Iterable<String>.toJsonArray() =
         "[${this.joinToString(", ")}]"
 
-    fun userdir() = System.getProperty("user.dir")
+    private fun userdir() : String = System.getProperty("user.dir")!!
 
     val WsSession.docId: String get() = this.pathParam("path")
 
