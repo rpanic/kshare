@@ -25,7 +25,7 @@ class Main{
 
     private val writingPath = System.getProperty("user.dir") + "/filedata/"
 
-    private val devPath = ""//""src/main/resources/"
+    private val devPath = "src/main/resources/"
 
     var numbers = RandomNumbers()
 
@@ -85,7 +85,7 @@ class Main{
 
             var moshi = Moshi.Builder().build()
 
-            var files = editor.files
+            var files = editor.files()
 
             var adapter : JsonAdapter<AttachedFile> = moshi.adapter(AttachedFile::class.java)
 
@@ -153,8 +153,12 @@ class Main{
             }
             println("Serving $path")
             try {
-                var s = Files.readAllLines(File(path).toPath()).joinToString("\n").replace("%123%", name)  //TODO Replace nur bei html oder so
-                it.html(s)//.joinToString { "\n" })
+                if(name.equals("favicon.ico")){
+                    it.result(File(path).inputStream())
+                }else {
+                    var s = Files.readAllLines(File(path).toPath()).joinToString("\n").replace("%123%", name)  //TODO Replace nur bei html oder so
+                    it.html(s)//.joinToString { "\n" })
+                }
             }catch (e: Exception){
                 e.printStackTrace()
             }
@@ -166,7 +170,7 @@ class Main{
                     map[session.docId] = Editor(session.docId)
                 }
                 session.idleTimeout = 1000000
-                map[session.docId]!!.connections.add(Connection(session, map[session.docId]!!))
+                map[session.docId]!!.connections().add(Connection(session, map[session.docId]!!))
                 println("Connected ${session.pathParam("path")}")
             }
 
@@ -180,8 +184,8 @@ class Main{
             ws.onClose { session, statusCode, reason ->
                 println("Closed because: $reason")
                 var sum = map.values.map { it.connections.size }.sum()
-                map.values.map { it.connections.removeAll{x -> x.ws.id == session.id} }
-                var sumAfter = map.values.map { it.connections.size }.sum()
+                map.values.map { it.connections().removeAll{x -> x.ws.id == session.id} }
+                var sumAfter = map.values.map { it.connections().size }.sum()
                 sumAfter = sum - sumAfter
                 if(sumAfter != 1){
                     println("Removal of connection failed: $sumAfter")

@@ -1,26 +1,26 @@
 <html>
     <head>
+        <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="styles/index.css" media="screen" />
         <link rel="stylesheet" type="text/css" href="/Semantic-UI/semantic.min.css">
         <link rel="stylesheet" type="text/css" href="filedrop.css" media="screen" />
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="footer.css" media="screen" />
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+        <meta name="Title" content="share - %123%"/>
+        <title>share - %123%</title> 
     </head>
     <body class="background">
         <div id="container"></div>
-        <!--<div class="fileparent" id="fileDrop">
-            <i class="filecenter fa fa-file-image-o fa-3x image" aria-hidden="true"></i>-->
 
         <div class="ui two column stackable grid">
             <div class="six wide column">
                 <div class="fileparent" id="fileDrop">  
-                    <!--<form method="post" enctype="multipart/form-data" id="fileForm" action="/uploadfile">-->
                         <div class="filecenter">
-                            <p class="ui inverted center small header" style="margin-top: -2em;">Upload Files:</p>
-                            <input type="file" name="file" class="ui secondary button center" onChange="fileselectchanged()" multiple>
+                            <!--<p class="ui inverted center small header">Upload Files:</p>-->
+                            <input type="file" name="file" class="ui secondary button center" onChange="/*fileselectchanged();*/ selectFile(event);" multiple>
                             </input>
-                            <button class="ui secondary button submit" id="fakefileselect" onClick="simulateClick();">Select File</button>
-                            <button class="ui secondary button submit" onClick="selectFile(event);">Submit</button>
+                            <button class="ui secondary button submit" id="fakefileselect" onClick="simulateClick();">Select and Upload File</button>
+                            <!--<button class="ui secondary button submit" onClick="selectFile(event);">Submit</button>-->
                             <!--<input type="submit" value="Upload File" name="submit" onClick="selectFile(event);" class="ui secondary button center">-->
                         </div>
                 </div>
@@ -30,10 +30,8 @@
         </div>
         <div id="footer" class="ui inverted vertical footer segment">
             <div class="ui container">
-                <a href="github.com/rpanic/kshare" style="text-decoration: none; color: inherit">API</a>
-                <!--<div class="ui stackable inverted divided equal height stackable grid">
-
-                </div>-->
+                <a href="https://github.com/rpanic/kshare" style="text-decoration: none; color: inherit">GitHub</a>
+                <a href="https://github.com/rpanic/kshare/wiki/File-Upload-API-Documentation" style="text-decoration: none; color: inherit">API</a>
             </div>
         </div>
     </body>
@@ -48,11 +46,7 @@
 
         require(['vs/editor/editor.main'], function() {
 		var editor = monaco.editor.create(document.getElementById('container'), {
-			value: ''/*[
-				'function x() {',
-                '\tconsole.log("Hello world!");',
-				'}'
-			].join('\n')*/,
+			value: '',
 			language: ''
         });
 
@@ -63,7 +57,7 @@
         $(window).ready(() => {
             window.editor = editor;
             window.timeoutcount = 0
-            window.timeouts = [0, 1000, 60000]
+            window.timeouts = [0, 1000, 5000, 30000, 60000]
             initWs();
         })
 

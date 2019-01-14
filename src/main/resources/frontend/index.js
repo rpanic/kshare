@@ -6,7 +6,13 @@ function initWs(){
     //ws.timeoutcount = window.timeoutcount
     window.ws = ws;
     ws.onclose = (event) => {
-        let timeout = window.timeouts[window.timeoutc];
+        let timeout;
+        if(window.timeouts.length < window.timeoutc + 1){
+            timeout = window.timeouts[window.timeouts.length - 1];
+        }else{
+            timeout = window.timeouts[window.timeoutc];
+        }
+        
         console.log("Disconnected - retrying in " + timeout)
         window.timeoutcount++;
         window.timeoutc++;
