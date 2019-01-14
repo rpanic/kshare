@@ -25,14 +25,20 @@ or compile it yourself with gradle.
 
 Our releases already include the monaco and frontend resources
 
+If you want to compile it yourself you will have to download the [monaco editor](https://microsoft.github.io/monaco-editor/) and [Semantic-UI](https://semantic-ui.com/) manually and put the extracted files into `/resources/frontend/monaco` folder.
+
 **Execute** the app with
 
 `java -jar kshare.jar`
     
 After executing, kshare will extract the necessary static files to the folder `frontend/`
+
+You will have to pass your url as an argument, for example:\
+`... -url shr.io`
     
 The default port is 80, but can be changed by the port argument\
 `... -port 80`
+
 
 #### File upload API
 

@@ -32,12 +32,23 @@ class Main{
     fun main(args: Array<String>) {
 
         var port = 80
+        var url = "shr.me";
 
-        if(args.size > 1){
-            if(args[0].startsWith("-p")){
-                port = args[1].toIntOrNull() ?: port
+        for(i in 0 until args.size step 2){
+            var key = args[i]
+            if(i + 2 > args.size) continue
+            if(args[i].startsWith("-p")){
+                port = args[i + 1].toIntOrNull() ?: port
+            }else if(args[i].startsWith("-u") || args[i].startsWith("-d")){
+                url = args[i + 1]
             }
+
         }
+
+        println("$url:$port")
+
+        if(url.endsWith("/"))
+            url = url.substring(0, url.length - 1)
 
         extractResource("frontend")
 
@@ -157,8 +168,8 @@ class Main{
                     it.result(File(path).inputStream())
                 }else {
                     var s = Files.readAllLines(File(path).toPath()).joinToString("\n")
-                    if(name.endsWith(".html")){
-                        s = s.replace("%123%", name)
+                    if(path.endsWith(".html")){
+                        s = s.replace("%123%", name).replace("%url%", url);
                     }
                     it.html(s)//.joinToString { "\n" })
                 }

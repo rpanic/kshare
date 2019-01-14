@@ -1,0 +1,31 @@
+@font-face{
+    font-family: "sfm";
+    src: url("/font/SF-Pro-Display-Medium.otf") format("opentype");
+}
+
+@font-face{
+    font-family: "sfm";
+    font-weight: 300;
+    src: url("/font/SF-Pro-Display-Thin.otf") format("opentype");
+}
+
+#footer a{
+    text-decoration: none; 
+    color: inherit; 
+    margin-right: 1.5em;
+}
+
+.sfm{
+    font-family: "sfm" !important;
+    font-weight: 300 !important;
+    font-style: normal;
+}
+
+.sfn{
+    font-family: "sfm" !important;
+    font-weight: normal !important;
+}
+
+.ls{
+    letter-spacing: 0.05em;
+}
