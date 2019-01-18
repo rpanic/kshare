@@ -34,6 +34,11 @@ class Main{
         var port = 80
         var url = "shr.me";
 
+        var statsFile = userdir() + "/stats.json"
+
+        var stats = Statistics(File(statsFile))
+        stats.init()
+
         for(i in 0 until args.size step 2){
             var key = args[i]
             if(i + 2 > args.size) continue
@@ -63,8 +68,6 @@ class Main{
             }
         }
 
-        println(System.getProperty("user.dir"))
-
         val app = Javalin.create().apply {
             enableCorsForAllOrigins()
             enableStaticFiles("/frontend/monaco")
@@ -74,6 +77,7 @@ class Main{
         app.get("/filedata/:name"){
 
             sendFile(it.pathParam("name"), it)
+            stats.addVisit("/filedata")
 
         }
 
@@ -134,6 +138,7 @@ class Main{
                     FileUtils.copyInputStreamToFile(content, y)
 
                     editor.addFile(AttachedFile(y.absolutePath, path + keyname, name))
+                    stats.addVisit("/uploadFile")
 
                 }
                 it.html("success")
@@ -143,6 +148,7 @@ class Main{
         app.get("/"){
             println("frontpage")
             it.html(File("${devPath}frontend/frontpage.html").readLines().joinToString("\n").replace("%123%", numbers.getNewNumber()))
+            stats.addVisit("/")
         }
 
         app.get("/:name"){ //TODO monaco folder einzeln
@@ -155,6 +161,8 @@ class Main{
             path += if(name.contains(".") || name.startsWith("monaco")){
                 name
             }else{
+                stats.addVisit("/$name")
+                stats.addVisit("/<editor>")
                 "index.html"
             }
             if(name.endsWith(".css")) {
