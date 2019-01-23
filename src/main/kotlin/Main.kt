@@ -239,7 +239,7 @@ class Main{
                 it.result(f.inputStream())
                 it.header("Content-Type", "application/download")
                 it.header("Content-Description", "File Transfer")
-                it.header("Content-Length", "${f.totalSpace}")
+                it.header("Content-Length", "${f.length()}")
                 var name = it.pathParam("name")
                 it.header("Content-Disposition", "attachment; filename=${name.substring(name.indexOf('_') + 1)}")
             }
