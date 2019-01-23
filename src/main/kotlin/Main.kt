@@ -116,6 +116,10 @@ class Main{
                 var key = it.header("key")
                 var editor = map.values.find { e -> e.name == key }!!  //TODO Nullpointer
 
+                if(it.uploadedFiles("file").isEmpty()){
+                    println("uploadfile with no files");
+                }
+
                 it.uploadedFiles("file").forEach { (_, content, name, _) ->
 
                     var keyname = key + "_" + name

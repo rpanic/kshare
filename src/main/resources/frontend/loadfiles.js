@@ -54,6 +54,32 @@ function copyPath(path){
 
 }
 
+function progress(e){
+    
+    var backgr = "#1b1c1d";
+    var color = "#00700b";
+
+    var progress = e.loaded / e.total * 100;
+
+    if(progress === 100){
+
+        setTimeout(() => {
+
+            $("#fakefileselect").css("background", "");
+            $("#fakefileselect").css("background-color", backgr);
+
+        }, 1000);
+
+        color = "#005e0a";
+
+    }
+
+    var gradient = "linear-gradient(to right, " + color + " " + progress + "%, " + backgr + " " + progress + "%)";
+
+    $("#fakefileselect").css("background", gradient);
+
+}
+
 function selectFile(event){
 
     var files = document.querySelector('[type=file]').files;
@@ -66,22 +92,60 @@ function selectFile(event){
             let key = split[split.length - 1];
 
 // **** Uploading File ****
-
+            
             const formData = new FormData();
             formData.append('file', file);
-            fetch('/uploadfile', {
-                method: 'POST',
-                body: formData,
+
+            $.ajax({
+                url: "/uploadfile",
+                type: "POST",
+                data: formData,
                 headers: {
                     "key": key
+                }, 
+                processData: false,
+                contentType: false,
+                xhr: function(){
+                    var hhh = $.ajaxSettings.xhr();
+                    if(hhh.upload){
+                        hhh.upload.addEventListener('progress', progress, false);
+                    }
+                    return hhh;
                 }
-            }).then(response => {
-                console.log("Fileupload response: " + response);
-                console.log(response)
-                if(response.status === 200){
-                    loadFiles();
-                }
-            });
+            })
+
+            // var xhr = new XMLHttpRequest();
+            // xhr.upload.addEventListener("progress", (e) => {
+            //     console.log("Progress");
+            //     console.log(e);
+            // }, false);
+            // xhr.onreadystatechange = (e) => {
+            //     console.log(e);
+            //     if (xhr.readyState == 4) {
+            //         // progress.className = (xhr.status == 200 ? "success" : "failure");
+            //         loadFiles();
+            //     }
+            // }
+            // xhr.open("POST", "/uploadfile", false);
+            // xhr.setRequestHeader("X-FILENAME", file.name);
+            // xhr.setRequestHeader("key", key);
+            // xhr.send(file);
+
+            // const formData = new FormData();
+            // formData.append('file', file);
+            // fetch('/uploadfile', {
+            //     method: 'POST',
+            //     body: formData,
+            //     headers: {
+            //         "key": key
+            //     }
+            // }).then(response => {
+            //     console.log("Fileupload response: " + response);
+            //     console.log(response)
+            //     if(response.status === 200){
+            //         loadFiles();
+            //     }
+            // });
         }
     }
 }
