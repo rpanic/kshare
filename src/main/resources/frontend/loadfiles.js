@@ -57,7 +57,7 @@ function copyPath(path){
 function progress(e){
     
     var backgr = "#1b1c1d";
-    var color = "#00700b";
+    var color = "#005005";
 
     var progress = e.loaded / e.total * 100;
 
@@ -70,7 +70,7 @@ function progress(e){
 
         }, 1000);
 
-        color = "#005e0a";
+        color = "#005005";
 
     }
 

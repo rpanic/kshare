@@ -1,54 +1,87 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <link rel="stylesheet" type="text/css" href="styles/index.css" media="screen" />
-        <link rel="stylesheet" type="text/css" href="/Semantic-UI/semantic.min.css">
-        <link rel="stylesheet" type="text/css" href="filedrop.css" media="screen" />
-        <link rel="stylesheet" type="text/css" href="footer.css" media="screen" />
-        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-        <meta name="Title" content="share - %123%"/>
-        <title>share - %123%</title> 
-    </head>
-    <body class="background">
-        <div id="container"></div>
 
-        <div class="ui two column stackable grid">
-            <div class="six wide column">
-                <div class="fileparent" id="fileDrop">  
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="styles/index.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="/Semantic-UI/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="filedrop.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="footer.css" media="screen" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="Title" content="share - %123%" />
+    <title>share - %123%</title>
+</head>
+
+<body class="background">
+
+    <div class="ui one column grid">
+
+        <!-- Container for Monaco -->
+        <div class="row">
+            <div id="container"></div>
+        </div>
+
+        <!-- Language Selection -->
+
+        <!--<div class="ui action input">
+            <select class="ui selection dropdown">
+                <option value="Eins">Eins</option>
+                <option value="zwei" selected="">zwei</option>
+            </select>
+        </div>-->
+        <!-- <div class="ui two column stackable grid"> -->
+        <div class="row">
+            <div class="ui very padded container" style="width: fit-content;">
+                <select id="syntaxSelect" class="ui search dropdown center aligned">
+                    <option value="Plaintext" selected="">Syntax</option>
+                </select>
+            </div>
+            <!-- </div> -->
+        </div>
+        </div>
+        <!-- Files  -->
+        <!-- <div class="row"> -->
+            <div class="ui two column stackable grid">
+                <div class="six wide column">
+                    <div class="fileparent" id="fileDrop">
                         <div class="filecenter">
                             <!--<p class="ui inverted center small header">Upload Files:</p>-->
-                            <input type="file" name="file" class="ui secondary button center" onChange="/*fileselectchanged();*/ selectFile(event);" multiple>
+                            <input type="file" name="file" class="ui secondary button center" onChange="/*fileselectchanged();*/ selectFile(event);"
+                                multiple>
                             </input>
                             <button class="ui secondary button submit sfn" style="letter-spacing: 1rm;" id="fakefileselect" onClick="simulateClick();">Select and Upload File</button>
                             <!--<button class="ui secondary button submit" onClick="selectFile(event);">Submit</button>-->
                             <!--<input type="submit" value="Upload File" name="submit" onClick="selectFile(event);" class="ui secondary button center">-->
                         </div>
+                    </div>
+                </div>
+                <div class="ten wide column filelist" id="fileList">
                 </div>
             </div>
-            <div class="ten wide column filelist" id="fileList">
-            </div>
-        </div>
+        <!-- </div> -->
+
+        <!-- Footer -->
         <div id="footer" class="ui inverted vertical footer segment">
             <div class="ui container">
                 <a href="https://github.com/rpanic/kshare" style="text-decoration: none; color: inherit">GitHub</a>
                 <a href="https://github.com/rpanic/kshare/wiki/File-Upload-API-Documentation" style="text-decoration: none; color: inherit">API</a>
             </div>
         </div>
-    </body>
-    <script>
-        var path = "%123%";
-        var url = "%url%";
-    </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="/Semantic-UI/semantic.min.js"></script>
-    <script src="/monaco/node_modules/monaco-editor/min/vs/loader.js"></script>
-    <script>
-        require.config({ paths: {'vs': '/monaco/node_modules/monaco-editor/min/vs'}});
+    <!-- </div> -->
+</body>
+<script>
+    var path = "%123%";
+    var url = "%url%";
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="/Semantic-UI/semantic.min.js"></script>
+<script src="/monaco/node_modules/monaco-editor/min/vs/loader.js"></script>
+<script>
+    require.config({ paths: { 'vs': '/monaco/node_modules/monaco-editor/min/vs' } });
 
-        require(['vs/editor/editor.main'], function() {
-		var editor = monaco.editor.create(document.getElementById('container'), {
-			value: '',
-			language: ''
+    require(['vs/editor/editor.main'], function () {
+        var editor = monaco.editor.create(document.getElementById('container'), {
+            value: '',
+            language: 'Plaintext'
         });
 
         editor.setValue("Loading...");
@@ -56,22 +89,29 @@
         monaco.editor.setTheme("vs-dark");
 
         $(window).ready(() => {
+
+            // All Inits of Monaco
+
             window.editor = editor;
             window.timeoutcount = 0
             window.timeouts = [0, 1000, 5000, 30000, 60000]
             initWs();
+
+            initLanguageSelect();
         })
 
         //setCursor(editor);
     });
-    
-    function setCursor(editor){
+
+    function setCursor(editor) {
         var decorations = editor.deltaDecorations([], [
-            { range: new monaco.Range(3, 1, 3, 2), options: { className: 'myCursor'} },
+            { range: new monaco.Range(3, 1, 3, 2), options: { className: 'myCursor' } },
         ]);
     }
 
-    </script>
-    <script src="loadfiles.js"></script>
-    <script src="index.js"></script>
+</script>
+<script src="loadfiles.js"></script>
+<script src="index.js"></script>
+<script src="editor.js"></script>
+
 </html>
