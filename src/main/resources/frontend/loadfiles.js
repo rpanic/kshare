@@ -32,7 +32,7 @@ function useFileJson(json){
         json.forEach(element => {
             var x = '<div class="ui secondary segment filecont">';
             x += '<div><a href="' + element.networkPath + '" target="blank" class="sfn ls">' + element.name + "</a>";
-            x += '<a href="' + element.networkPath + '" class="ui secondary button submit sfn ls" style="float: right; margin-top: -0.6em;">Open</a>';
+            x += '<a href="' + element.networkPath + '" class="ui secondary button submit sfn ls" style="float: right; margin-top: -0.6em;">Download</a>';
             x += '<a onClick="copyPath(\'' + url + escape(element.networkPath) + '\');" class="ui secondary button submit sfn ls" style="float: right; margin-top: -0.6em;">Copy Link</button>';
             x+= '';
             x += '</div></div>';
