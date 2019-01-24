@@ -42,8 +42,14 @@ class Main{
                 port = args[i + 1].toIntOrNull() ?: port
             }else if(args[i].startsWith("-u") || args[i].startsWith("-d")){
                 url = args[i + 1]
-            }
+            }else if(args[i].startsWith("-i")) { //-ide
 
+                if(args[i + 1].toBoolean()){
+
+                    devPath = "src/main/resources/"
+
+                }
+            }
         }
 
         var statsFile = userdir() + "/stats.json"

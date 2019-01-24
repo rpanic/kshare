@@ -1,10 +1,9 @@
-import io.kweb.shoebox.toArrayList
 import java.io.File
 
 class RandomNumbers{
 
     private var file = File(System.getProperty("user.dir") + "/usednumbers.csv")
-    private var usedNumbers = ArrayList<String>()
+    private var usedNumbers = mutableListOf<String>()
 
     fun init(){
 
@@ -12,7 +11,7 @@ class RandomNumbers{
             return
 
         if(file.exists())
-            usedNumbers = file.readLines().joinToString(";").split(";").toArrayList()
+            usedNumbers = file.readLines().joinToString(";").split(";").toMutableList()
     }
 
     fun getNewNumber() : String{
