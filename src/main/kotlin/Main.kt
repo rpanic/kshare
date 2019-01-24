@@ -8,6 +8,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.apache.commons.io.FileUtils
+import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory
+import org.eclipse.jetty.http2.HTTP2Cipher
+import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory
+import org.eclipse.jetty.server.*
+import org.eclipse.jetty.util.ssl.SslContextFactory
 import java.io.BufferedInputStream
 import java.io.File
 import java.nio.file.Files
@@ -25,7 +30,7 @@ class Main{
 
     private val writingPath = System.getProperty("user.dir") + "/filedata/"
 
-    private val devPath = "src/main/resources/"
+    private var devPath = ""//""src/main/resources/"
 
     var numbers = RandomNumbers()
 
@@ -46,8 +51,14 @@ class Main{
                 port = args[i + 1].toIntOrNull() ?: port
             }else if(args[i].startsWith("-u") || args[i].startsWith("-d")){
                 url = args[i + 1]
-            }
+            }else if(args[i].startsWith("-i")) { //-ide
 
+                if(args[i + 1].toBoolean()){
+
+                    devPath = "src/main/resources/"
+
+                }
+            }
         }
 
         println("$url:$port")
@@ -69,6 +80,7 @@ class Main{
         }
 
         val app = Javalin.create().apply {
+            server{ createHttp2Server()}
             enableCorsForAllOrigins()
             enableStaticFiles("/frontend/monaco")
 
@@ -227,6 +239,45 @@ class Main{
             if(s!!.startsWith("s")){
                 saveEditors()
             }
+        }
+
+    }
+
+    private fun createHttp2Server(): Server {
+
+        val alpn = ALPNServerConnectionFactory().apply {
+            defaultProtocol = "h2"
+        }
+
+        val sslContextFactory = SslContextFactory().apply {
+            keyStorePath = File(userdir() + "/keystore.jks").path
+            setKeyStorePassword(File(userdir() + "/password.txt").readText())
+            cipherComparator = HTTP2Cipher.COMPARATOR
+            provider = "Conscrypt"
+        }
+
+        val ssl = SslConnectionFactory(sslContextFactory, alpn.protocol)
+
+        val httpsConfig = HttpConfiguration().apply {
+            sendServerVersion = false
+            secureScheme = "https"
+            securePort = 8443
+            addCustomizer(SecureRequestCustomizer())
+        }
+
+        val http2 = HTTP2ServerConnectionFactory(httpsConfig)
+
+        val fallback = HttpConnectionFactory(httpsConfig)
+
+        return Server().apply {
+            //HTTP/1.1 Connector
+            addConnector(ServerConnector(server).apply {
+                port = 8080
+            })
+            // HTTP/2 Connector
+            addConnector(ServerConnector(server, ssl, alpn, http2, fallback).apply {
+                port = 8443
+            })
         }
 
     }
