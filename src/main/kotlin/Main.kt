@@ -4,15 +4,16 @@ import com.squareup.moshi.Types
 import io.javalin.Context
 import io.javalin.Javalin
 import io.javalin.websocket.WsSession
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.apache.commons.io.FileUtils
 import java.io.BufferedInputStream
 import java.io.File
 import java.nio.file.Files
 import java.util.*
 import java.util.jar.JarFile
+import org.eclipse.jetty.util.ssl.SslContextFactory
+import org.eclipse.jetty.server.Connector
+import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.server.ServerConnector
 
 fun main(args: Array<String>) {
     Main().main(args)
@@ -25,7 +26,7 @@ class Main{
 
     private val writingPath = System.getProperty("user.dir") + "/filedata/"
 
-    private val devPath = "src/main/resources/"
+    private var devPath = ""//""src/main/resources/"
 
     var numbers = RandomNumbers()
 
@@ -33,11 +34,6 @@ class Main{
 
         var port = 80
         var url = "shr.me";
-
-        var statsFile = userdir() + "/stats.json"
-
-        var stats = Statistics(File(statsFile))
-        stats.init()
 
         for(i in 0 until args.size step 2){
             var key = args[i]
@@ -50,7 +46,12 @@ class Main{
 
         }
 
-        println("$url:$port")
+        var statsFile = userdir() + "/stats.json"
+
+        var stats = Statistics(File(statsFile))
+        stats.init()
+
+        println("Starting $url:$port")
 
         if(url.endsWith("/"))
             url = url.substring(0, url.length - 1)
@@ -61,14 +62,25 @@ class Main{
 
         numbers.init()
 
-        GlobalScope.launch {
-            while(true){
-                delay(100000L)
-                saveEditors()
-            }
-        }
+//        GlobalScope.launch { TODO
+//            while(true){
+//                delay(100000L)
+//                saveEditors()
+//            }
+//        }
 
         val app = Javalin.create().apply {
+
+            server{
+                val server = Server()
+                val sslConnector = ServerConnector(server, getSslContextFactory())
+                sslConnector.port = 443
+                val connector = ServerConnector(server)
+                connector.port = 80
+                server.setConnectors(arrayOf<Connector>(sslConnector, connector))
+                server
+            }
+
             enableCorsForAllOrigins()
             enableStaticFiles("/frontend/monaco")
 
@@ -249,6 +261,13 @@ class Main{
             }
 
         }catch(e: Throwable){e.printStackTrace()}
+    }
+
+    private fun getSslContextFactory(): SslContextFactory {
+        val sslContextFactory = SslContextFactory()
+        sslContextFactory.keyStorePath = userdir() + "/keystore.jks"
+        sslContextFactory.setKeyStorePassword("voyager1")
+        return sslContextFactory
     }
 
     fun extractResource(path: String) {
