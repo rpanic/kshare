@@ -35,6 +35,8 @@ class Main{
         var port = 80
         var url = "shr.me";
 
+        var ssl = true;
+
         for(i in 0 until args.size step 2){
             var key = args[i]
             if(i + 2 > args.size) continue
@@ -49,6 +51,10 @@ class Main{
                     devPath = "src/main/resources/"
 
                 }
+            }else if(args[i].startsWith("-s")) {   //-ssl
+
+                ssl = args[i + 1].toBoolean()
+
             }
         }
 
@@ -77,14 +83,16 @@ class Main{
 
         val app = Javalin.create().apply {
 
-            server{
-                val server = Server()
-                val sslConnector = ServerConnector(server, getSslContextFactory())
-                sslConnector.port = 443
-                val connector = ServerConnector(server)
-                connector.port = 80
-                server.setConnectors(arrayOf<Connector>(sslConnector, connector))
-                server
+            if(ssl) {
+                server {
+                    val server = Server()
+                    val sslConnector = ServerConnector(server, getSslContextFactory())
+                    sslConnector.port = 443
+                    val connector = ServerConnector(server)
+                    connector.port = 80
+                    server.setConnectors(arrayOf<Connector>(sslConnector, connector))
+                    server
+                }
             }
 
             enableCorsForAllOrigins()
