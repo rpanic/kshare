@@ -57,7 +57,7 @@ function setBlocked(b) {
 var codedUndo = false
 
 function onChange(event) {
-    //console.log(event)
+    
     console.log(event)
 
     if ((event.isUndoing === false || codedUndo === false) && event.isFlush === false) {
@@ -119,21 +119,45 @@ function remoteChanged(event) {
         console.log("debug " + split)
         let newText = event.data.slice(split[0].length + split[1].length + 2);
         console.log("debug2 " + newText)
-        v = v.slice(0, parseInt(split[1])) + "" + newText + v.slice(parseInt(split[1]));
+
+        let pos = parseInt(split[1]);
+
+        let arr = getLineColumn(pos, v);
+
+        setBlocked(true);
+        window.editor.getModel().applyEdits([
+            { forceMoveMarkers: false, range: new monaco.Range(arr[0],arr[1],arr[0],arr[1]), text: newText }
+        ]);
+
+        // v = v.slice(0, parseInt(split[1])) + "" + newText + v.slice(parseInt(split[1]));
         /*var temp = window.editor.onDidChangeModelContent;
         window.editor.onDidChangeModelContent = () => {
             console.log("got one empty")
             window.editor.onDidChangeModelContent = temp;
         }*/
-        setBlocked(true);
-        window.editor.setValue(v);
+        // window.editor.setValue(v);
     } else if (split[0] === "del") {
 
         let offset = parseInt(split[1]);
         let length = parseInt(split[2]);
-        v = v.slice(0, offset) + v.slice(offset + length, v.length)
-        setBlocked(true)
-        window.editor.setValue(v);
+        
+        let from = getLineColumn(offset, v);
+        // console.log("From: " + from.toString() + " Offset: " + offset.toString() + " v: " + v.toString());
+        let to = getLineColumn(offset + length, v);
+        // console.log("TO: " + to)
+
+        console.log(from[0] + " " + from[1] + " " + to[0] + " " + to[1]);
+        
+        // window.editor.pushUndoStop();
+        setBlocked(true);
+        window.editor.getModel().applyEdits([
+            { forceMoveMarkers: false, range: new monaco.Range(from[0],from[1],to[0],to[1]), text: null }
+        ]);
+        // window.editor.pushUndoStop();
+        
+        console.log("del executed");
+
+        // window.editor.setValue(v);
     } else if (split[0] === "failed") {
         codedUndo = true;
         window.editor.getModel().undo();
@@ -141,6 +165,31 @@ function remoteChanged(event) {
         loadFiles()
     }
 }
+
+function getLineColumn(pos, str){
+    let line = 1;
+    let column = 0;
+    let count = 0;
+
+    for (var i = 0; i < str.length && i < pos; i++) {
+        let char = str.charAt(i);
+        if(char === '\n'){
+            line++;
+            column = 0;
+        }else{
+            column++;
+        }
+        count ++;
+    }
+
+    if(count != pos){
+        console.log("Something wrong in algorithm");
+    }
+    
+    return [line, column + 1];
+}
+
+
 
 $(window).ready(() => {
     $("[type=file]").hide();
