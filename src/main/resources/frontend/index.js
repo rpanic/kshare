@@ -2,7 +2,7 @@ function initWs() {
 
     let split = location.href.split("/");
     let key = split[split.length - 1];
-    let ws = new WebSocket("ws://" + location.host + "/websocket/" + key);
+    let ws = new WebSocket(websocketProtocol + "://" + location.host + "/websocket/" + key);
 
     window.ws = ws;
     ws.onclose = (event) => {

@@ -34,7 +34,6 @@ class Main{
 
         var port = 80
         var url = "kshare.me";
-
         var ssl = true;
 
         for(i in 0 until args.size step 2){
@@ -185,7 +184,9 @@ class Main{
 
         app.get("/"){
             println("frontpage")
-            it.html(File("${devPath}frontend/frontpage.html").readLines().joinToString("\n").replace("%123%", numbers.getNewNumber()))
+            it.html(File("${devPath}frontend/frontpage.html").readLines()
+                .joinToString("\n")
+                .replace("%123%", numbers.getNewNumber()))
             stats.addVisit("/")
         }
 
@@ -215,7 +216,10 @@ class Main{
                 }else {
                     var s = Files.readAllLines(File(path).toPath()).joinToString("\n")
                     if(path.endsWith(".html")){
-                        s = s.replace("%123%", name).replace("%url%", url);
+                        s = s
+                            .replace("%123%", name)
+                            .replace("%url%", url)
+                            .replace("%ssl%", if(ssl) "wss" else "ws")
                     }
                     it.html(s)//.joinToString { "\n" })
                 }
