@@ -33,7 +33,7 @@ class Main{
     fun main(args: Array<String>) {
 
         var port = 80
-        var url = "shr.me";
+        var url = "kshare.me";
 
         var ssl = true;
 
@@ -92,6 +92,14 @@ class Main{
                     connector.port = 80
                     server.setConnectors(arrayOf<Connector>(sslConnector, connector))
                     server
+                }
+                before {
+                    if (!it.req.isSecure) {
+                        var split = it.req.requestURL.split("://")
+                        if(split.size >= 2){
+                            it.redirect("https://${split.get(1)}")
+                        }
+                    }
                 }
             }
 
