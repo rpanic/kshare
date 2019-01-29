@@ -74,6 +74,12 @@ class Main{
 
         numbers.init()
 
+        Thread{
+            while(true){
+                Thread.sleep(100000L)
+                saveEditors()
+            }
+        }
 //        GlobalScope.launch { TODO
 //            while(true){
 //                delay(100000L)
