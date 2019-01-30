@@ -39,6 +39,10 @@ You will have to pass your url as an argument, for example:\
 The default port is 80, but can be changed by the port argument\
 `... -port 80`
 
+SSH is enabled by default, disable it with\
+`... -ssh false`
+
+When executing from an IDE append `-ide true`
 
 #### File upload API
 
