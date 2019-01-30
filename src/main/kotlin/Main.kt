@@ -21,6 +21,8 @@ fun main(args: Array<String>) {
 
 class Main{
 
+    val frontend_version = "1.0.1";
+
     var map = HashMap<String, Editor>()
     val path = "/filedata/"
 
@@ -67,7 +69,7 @@ class Main{
         if(url.endsWith("/"))
             url = url.substring(0, url.length - 1)
 
-        extractResource("frontend")
+        extractFrontend("frontend")
 
         loadEditors()
 
@@ -302,11 +304,23 @@ class Main{
         return sslContextFactory
     }
 
-    fun extractResource(path: String) {
+    fun extractFrontend(path: String) {
 
-        var root = File(userdir() + "/frontend")
+        var root = File(userdir() + "/" + path)
         if(root.isDirectory && root.exists()){
-            return
+
+            var versionfile = File(root.path + "/frontend.version")
+
+            if(versionfile.exists()) {
+                var version = versionfile.readLines().joinToString()
+
+                if (version.equals(frontend_version)) {
+                    return
+                } else {
+                    println("New version detected: Switching frontend from $version to $frontend_version")
+                    root.deleteRecursively()
+                }
+            }
         }
 
         val jarFile = File(javaClass.protectionDomain.codeSource.location.path)
@@ -338,7 +352,7 @@ class Main{
 //                    for (app in apps.listFiles()) {
 //                        System.out.println(app)
 //                        if (app.isDirectory) {
-//                            extractResource(path + "/" + app.name)
+//                            extractFrontend(path + "/" + app.name)
 //                        } else {
 //                            if(!app.parentFile.exists())
 //                                app.parentFile.mkdir()
