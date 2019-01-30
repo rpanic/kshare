@@ -76,8 +76,8 @@ function onChange(event) {
 
                 if (element.rangeLength > 0 && element.text === "") {
                     //Delete
-                    window.ws.send("delete " + element.rangeOffset + " " + element.rangeLength);
-                } else {
+                    window.ws.send(`delete ${element.rangeOffset} ${element.rangeLength}`);
+                } else if(element.rangeLength == 0) {
                     //Insert
 
                     let elementtext = element.text;
@@ -89,7 +89,13 @@ function onChange(event) {
                         window.editor.setValue(v);
                     }*/ //TODO Autocomplete fixen - zurzeit deaktiviert
 
-                    window.ws.send("insert " + element.rangeOffset + " " + elementtext);
+                    window.ws.send(`insert ${element.rangeOffset} ${elementtext}`);
+                } else if(element.rangeLength > 0 && element.text !== ""){
+
+                    //Mark and change
+                    window.ws.send(`delete ${element.rangeOffset} ${element.rangeLength}`);
+                    window.ws.send(`insert ${element.rangeOffset} ${element.text}`);
+
                 }
 
             });
