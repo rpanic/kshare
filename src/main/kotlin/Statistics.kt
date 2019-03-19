@@ -34,8 +34,10 @@ class Statistics(var f: File){
     }
 
     private fun save(){
-        f.writeText(adapter.toJson(statistic))
+        f.writeText(toJson())
     }
+
+    fun toJson() = adapter.toJson(statistic)
 
     data class Statistic(var visits: Int,
                          var visitsPerSite: MutableMap<String, Int>){

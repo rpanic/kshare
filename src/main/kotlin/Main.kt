@@ -198,6 +198,12 @@ class Main{
             stats.addVisit("/")
         }
 
+        app.get("/admin/stats"){
+
+            it.json(stats.toJson())
+
+        }
+
         app.get("/:name"){ //TODO monaco folder einzeln
 
             println("name")
