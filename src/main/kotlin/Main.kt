@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
 
 class Main{
 
-    val frontend_version = "1.0.1";
+    val frontend_version = "1.1.0";
 
     var map = HashMap<String, Editor>()
     val path = "/filedata/"
@@ -326,6 +326,8 @@ class Main{
                     println("New version detected: Switching frontend from $version to $frontend_version")
                     root.deleteRecursively()
                 }
+            }else{
+                versionfile.writeText(frontend_version)
             }
         }
 
