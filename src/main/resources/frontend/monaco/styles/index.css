@@ -25,14 +25,21 @@
 	right: 0; */
 	margin-top: 1em;
 	width: 100%;
-	/* height: 83%; */
 	height: 100%;
 }
 
 .containerRow{
-	height: 74%;
+	height: 88%;
 }
 
 .submit{
 	margin-top: 0.6em;
+}
+
+.ui.one.column.grid{
+	height: 80%;
+}
+
+.ui.two.column.stackable.grid{
+	height: 23%;
 }
