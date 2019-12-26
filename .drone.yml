@@ -1,0 +1,24 @@
+kind: pipeline
+type: exec
+name: kshare
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  commands:
+  - docker build -t kshare .
+- name: cleanup
+  commands:
+  - docker stop kshare || true
+  - docker rm kshare || true
+- name: deploy
+  commands:
+  - docker volume create ksharevolume || true
+  - docker run -d --name kshare -v ksharevolume:/app/data -p 90:90 kshare
+  
+trigger:
+  branch:
+  - master
