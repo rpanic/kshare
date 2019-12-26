@@ -276,8 +276,12 @@ class Main{
 
         while(true){
             var s = readLine()
-            if(s!!.startsWith("s")){
-                saveEditors()
+            if(s != null){
+                if(s!!.startsWith("s")){
+                    saveEditors()
+                }
+            }else{
+                break
             }
         }
 
