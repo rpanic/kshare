@@ -235,7 +235,7 @@ class Main{
                             .replace("%url%", url)
                             .replace("%ssl%", if(ssl) "wss" else "ws")
                     }
-                    it.html(s)//.joinToString { "\n" })
+                    it.html(s)
                 }
             }catch (e: Exception){
                 e.printStackTrace()
