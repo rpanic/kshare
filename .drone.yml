@@ -17,7 +17,8 @@ steps:
 - name: deploy
   commands:
   - docker volume create ksharevolume || true
-  - docker run -d --name kshare -v ksharevolume:/app/data -p 95:95 kshare
+  - docker volume create ksharefrontend || true
+  - docker run -d --name kshare -v ksharevolume:/app/data -v ksharefrontend:/app/frontend -p 95:95 kshare
   
 trigger:
   branch:
