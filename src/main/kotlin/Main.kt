@@ -3,6 +3,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import io.javalin.Context
 import io.javalin.Javalin
+import io.javalin.staticfiles.Location
 import io.javalin.websocket.WsSession
 import org.apache.commons.io.FileUtils
 import java.io.BufferedInputStream
@@ -111,7 +112,7 @@ class Main{
             }
 
             enableCorsForAllOrigins()
-            enableStaticFiles("/frontend/monaco")
+            enableStaticFiles("/frontend/monaco", Location.EXTERNAL)
 
         }.start(port)
 
