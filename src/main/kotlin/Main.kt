@@ -112,7 +112,7 @@ class Main{
             }
 
             enableCorsForAllOrigins()
-            enableStaticFiles("/frontend/monaco", Location.EXTERNAL)
+            enableStaticFiles(userdir() + "/frontend/monaco", Location.EXTERNAL)
 
         }.start(port)
 
