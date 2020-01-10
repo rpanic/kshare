@@ -309,8 +309,8 @@ class Main{
 
     private fun getSslContextFactory(): SslContextFactory {
         val sslContextFactory = SslContextFactory()
-        sslContextFactory.keyStorePath = userdir() + "/keystore.jks"
-        sslContextFactory.setKeyStorePassword("voyager1")
+        sslContextFactory.keyStorePath = userdir() + "/certificate/keystore.jks"
+        sslContextFactory.setKeyStorePassword(File("${userdir()}/certificate/password.conf").readText())
         return sslContextFactory
     }
 
