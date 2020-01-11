@@ -55,7 +55,7 @@ class Main{
                     devPath = "src/main/resources/"
 
                 }
-            }else if(args[i].startsWith("-s")) {   //-ssl
+            }else if(args[i].startsWith("-ss")) {   //-ssl
 
                 ssl = args[i + 1].toBoolean()
 
