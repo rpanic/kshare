@@ -8,4 +8,4 @@ FROM openjdk:8
 COPY --from=builder /home/gradle/src/build/libs/kshare-0.1.jar /app/kshare-0.1.jar
 WORKDIR /app
 EXPOSE 95
-CMD ["java", "-jar", "kshare-0.1.jar", "-d", "rpanic.com", "-port", "95"]
+CMD ["echo", "hello world"]
