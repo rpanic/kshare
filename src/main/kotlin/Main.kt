@@ -39,6 +39,7 @@ class Main{
         var sslport = 443
         var url = "kshare.me";
         var ssl = true;
+        var secureWebsocket = false
 
         for(i in 0 until args.size step 2){
             var key = args[i]
@@ -58,6 +59,8 @@ class Main{
 
                 ssl = args[i + 1].toBoolean()
 
+            }else if(args[i].startsWith("-sec")) { //secure Websocket
+                secureWebsocket = args[i + 1].toBoolean()
             }
         }
 
@@ -235,7 +238,7 @@ class Main{
                         s = s
                             .replace("%123%", name)
                             .replace("%url%", url)
-                            .replace("%ssl%", if(ssl) "wss" else "ws")
+                            .replace("%wsprotocol%", if(ssl || secureWebsocket) "wss" else "ws")
                     }
                     it.html(s)
                 }
