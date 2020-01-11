@@ -18,8 +18,7 @@ steps:
   commands:
   - docker volume create ksharevolume || true
   - docker volume create ksharefrontend || true
-  - docker volume create ksharecertificate || true
-  - docker run -d --name kshare -v ksharevolume:/app/data -v ksharefrontend:/app/frontend -v ksharecertificate:/app/certificate -p 95:95 kshare
+  - docker run -d --name kshare -v ksharevolume:/app/data -v ksharefrontend:/app/frontend -p 95:95 kshare
   
 trigger:
   branch:
