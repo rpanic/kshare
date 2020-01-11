@@ -113,7 +113,7 @@ class Main{
             }
 
             enableCorsForAllOrigins()
-            enableStaticFiles(userdir() + "/frontend/monaco", Location.EXTERNAL)
+            enableStaticFiles(userdir() + "${File.separatorChar}frontend${File.separatorChar}monaco", Location.EXTERNAL)
 
         }.start(port)
 
@@ -311,8 +311,8 @@ class Main{
 
     private fun getSslContextFactory(): SslContextFactory {
         val sslContextFactory = SslContextFactory()
-        sslContextFactory.keyStorePath = userdir() + "/certificate/keystore.jks"
-        val file = File("${userdir()}/certificate/password.conf")
+        sslContextFactory.keyStorePath = userdir() + "${File.separatorChar}certificate${File.separatorChar}keystore.jks"
+        val file = File("${userdir()}${File.separatorChar}certificate${File.separatorChar}password.conf")
         println("Config file: ${file.absolutePath}")
         println("Text: " + file.readText())
         sslContextFactory.setKeyStorePassword(file.readText())
