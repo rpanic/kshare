@@ -36,6 +36,7 @@ class Main{
     fun main(args: Array<String>) {
 
         var port = 80
+        var sslport = 443
         var url = "kshare.me";
         var ssl = true;
 
@@ -95,9 +96,9 @@ class Main{
                 server {
                     val server = Server()
                     val sslConnector = ServerConnector(server, getSslContextFactory())
-                    sslConnector.port = 443
+                    sslConnector.port = sslport
                     val connector = ServerConnector(server)
-                    connector.port = 80
+                    connector.port = port
                     server.setConnectors(arrayOf<Connector>(sslConnector, connector))
                     server
                 }
@@ -311,7 +312,10 @@ class Main{
     private fun getSslContextFactory(): SslContextFactory {
         val sslContextFactory = SslContextFactory()
         sslContextFactory.keyStorePath = userdir() + "/certificate/keystore.jks"
-        sslContextFactory.setKeyStorePassword(File("${userdir()}/certificate/password.conf").readText())
+        val file = File("${userdir()}/certificate/password.conf")
+        println("Config file: ${file.absolutePath}")
+        println("Text: " + file.readText())
+        sslContextFactory.setKeyStorePassword(file.readText())
         return sslContextFactory
     }
 
