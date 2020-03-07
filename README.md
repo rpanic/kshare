@@ -8,6 +8,8 @@
 
 A running instance of kShare can be used at [rpanic.com](rpanic.com)
 
+[![Build Status](https://drone.rpanic.com/api/badges/rpanic/kshare/status.svg)](https://drone.rpanic.com/rpanic/kshare)
+
 #### Editors instances
 
 Every new editor and file-storing instance has a unique key. \
