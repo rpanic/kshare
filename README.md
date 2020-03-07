@@ -4,9 +4,9 @@
 
 - Backend written in Kotlin with [javalin](javalin.io)
 - built-in [monaco](https://microsoft.github.io/monaco-editor/) editor
-- easy-to-use file upload [api](link)
+- easy-to-use file upload [api](https://github.com/rpanic/kshare/wiki/File-Upload-API-Documentation)
 
-A running instance of kShare can be used at [kshare.me](kshare.me)
+A running instance of kShare can be used at [rpanic.com](rpanic.com)
 
 #### Editors instances
 
@@ -15,7 +15,7 @@ The key of a instance displayed in the url like: `kshare.me/key`
 
 You can also generate a random key by going to the index.html (`f.e. "kshare.me/"`)
 
-[Test it yourself](kshare.me)
+[Test it yourself](rpanic.com)
 
 #### Install it yourself
 
