@@ -116,7 +116,7 @@ class Main{
             }
 
             enableCorsForAllOrigins()
-            enableStaticFiles(userdir() + "${File.separatorChar}frontend${File.separatorChar}monaco", Location.EXTERNAL)
+            enableStaticFiles(userdir() + File.separatorChar + devPath + "frontend${File.separatorChar}monaco", Location.EXTERNAL)
 
         }.start(port)
 
@@ -206,6 +206,18 @@ class Main{
         app.get("/admin/stats"){
 
             it.json(stats.toJson())
+
+        }
+
+        app.get("/:name/raw"){
+
+            var name = it.pathParam("name")
+
+            stats.addVisit("/$name")
+            stats.addVisit("/<editor>")
+
+            val editor = if (map.containsKey(name)) map[name]!! else Editor(name).apply { map[name] = this }
+            it.result(editor.text)
 
         }
 
