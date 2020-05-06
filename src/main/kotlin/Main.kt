@@ -245,7 +245,14 @@ class Main{
                 if(name == "favicon.ico"){
                     it.result(File(path).inputStream())
                 }else {
-                    var s = Files.readAllLines(File(path).toPath()).joinToString("\n")
+                    var s = "File not found"
+                    
+                    try {
+                        s = Files.readAllLines(File(path).toPath()).joinToString("\n")
+                    }catch(e: java.lang.Exception){
+                        println("Route not found $path")
+                    }
+
                     if(path.endsWith(".html")){
                         s = s
                             .replace("%123%", name)
