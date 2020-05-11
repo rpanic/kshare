@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
     Main().main(args)
 }
 
-class Main{
+class Main {
 
     val frontend_version = "1.1.0";
 
@@ -41,37 +41,37 @@ class Main{
         var ssl = true;
         var secureWebsocket = false
 
-        for(i in 0 until args.size step 2){
+        for (i in 0 until args.size step 2) {
             var key = args[i]
-            if(i + 2 > args.size) continue
-            if(args[i].startsWith("-p")){
+            if (i + 2 > args.size) continue
+            if (args[i].startsWith("-p")) {
                 port = args[i + 1].toIntOrNull() ?: port
-            }else if(args[i].startsWith("-u") || args[i].startsWith("-d")){
+            } else if (args[i].startsWith("-u") || args[i].startsWith("-d")) {
                 url = args[i + 1]
-            }else if(args[i].startsWith("-i")) { //-ide
+            } else if (args[i].startsWith("-i")) { //-ide
 
-                if(args[i + 1].toBoolean()){
+                if (args[i + 1].toBoolean()) {
 
                     devPath = "src/main/resources/"
 
                 }
-            }else if(args[i].startsWith("-ss")) {   //-ssl
+            } else if (args[i].startsWith("-ss")) {   //-ssl
 
                 ssl = args[i + 1].toBoolean()
 
-            }else if(args[i].startsWith("-sec")) { //secure Websocket
+            } else if (args[i].startsWith("-sec")) { //secure Websocket
                 secureWebsocket = args[i + 1].toBoolean()
             }
         }
 
-        var statsFile = userdir() + "/stats.json"
+        var statsFile = userdir() + "/data/stats.json"
 
         var stats = Statistics(File(statsFile))
         stats.init()
 
         println("Starting $url:$port")
 
-        if(url.endsWith("/"))
+        if (url.endsWith("/"))
             url = url.substring(0, url.length - 1)
 
         extractFrontend("frontend")
@@ -80,8 +80,8 @@ class Main{
 
         numbers.init()
 
-        Thread{
-            while(true){
+        Thread {
+            while (true) {
                 Thread.sleep(100000L)
                 saveEditors()
             }
@@ -95,7 +95,7 @@ class Main{
 
         val app = Javalin.create().apply {
 
-            if(ssl) {
+            if (ssl) {
                 server {
                     val server = Server()
                     val sslConnector = ServerConnector(server, getSslContextFactory())
@@ -108,7 +108,7 @@ class Main{
                 before {
                     if (!it.req.isSecure) {
                         var split = it.req.requestURL.split("://")
-                        if(split.size >= 2){
+                        if (split.size >= 2) {
                             it.redirect("https://${split.get(1)}")
                         }
                     }
@@ -120,26 +120,26 @@ class Main{
 
         }.start(port)
 
-        app.get("/filedata/:name"){
+        app.get("/filedata/:name") {
 
             sendFile(it.pathParam("name"), it)
             stats.addVisit("/filedata")
 
         }
 
-        app.post("getfile"){
+        app.post("getfile") {
 
             var key = it.header("key")
             var file = it.header("filename")
             var path = it.header("path")
-            if(path != null){
+            if (path != null) {
                 sendFile(path, it)
-            }else if(key != null && file != null)
+            } else if (key != null && file != null)
                 sendFile("${key}_{$file}", it)
 
         }
 
-        app.post("/listfiles"){
+        app.post("/listfiles") {
 
             var key = it.header("key")
             var editor = map.values.find { e -> e.name == key }!!
@@ -148,21 +148,21 @@ class Main{
 
             var files = editor.files()
 
-            var adapter : JsonAdapter<AttachedFile> = moshi.adapter(AttachedFile::class.java)
+            var adapter: JsonAdapter<AttachedFile> = moshi.adapter(AttachedFile::class.java)
 
             var s = files.map { f -> adapter.toJson(f) }.toJsonArray()
 
             it.json(s)
         }
 
-        app.post("/uploadfile"){
+        app.post("/uploadfile") {
 
             try {
 
                 var key = it.header("key")
                 var editor = map.values.find { e -> e.name == key }!!  //TODO Nullpointer
 
-                if(it.uploadedFiles("file").isEmpty()){
+                if (it.uploadedFiles("file").isEmpty()) {
                     println("uploadfile with no files");
                 }
 
@@ -174,13 +174,13 @@ class Main{
                     var y = x
                     var i = 0
                     println(x.absolutePath)
-                    while(y.exists()){
+                    while (y.exists()) {
                         y = File("${x.parent}\\${x.nameWithoutExtension}$i.${x.extension}")
                         println(y.absolutePath)
                         i++
                     }
 
-                    if(!x.parentFile.exists()){
+                    if (!x.parentFile.exists()) {
                         x.parentFile.mkdirs()
                     }
 
@@ -192,24 +192,26 @@ class Main{
 
                 }
                 it.html("success")
-            }catch (e: Exception){e.printStackTrace()}
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
-        app.get("/"){
+        app.get("/") {
             println("frontpage")
             it.html(File("${devPath}frontend/frontpage.html").readLines()
-                .joinToString("\n")
-                .replace("%123%", numbers.getNewNumber()))
+                    .joinToString("\n")
+                    .replace("%123%", numbers.getNewNumber()))
             stats.addVisit("/")
         }
 
-        app.get("/admin/stats"){
+        app.get("/admin/stats") {
 
             it.json(stats.toJson())
 
         }
 
-        app.get("/:name/raw"){
+        app.get("/:name/raw") {
 
             var name = it.pathParam("name")
 
@@ -221,54 +223,55 @@ class Main{
 
         }
 
-        app.get("/:name"){ //TODO monaco folder einzeln
+        app.get("/:name") {
+            //TODO monaco folder einzeln
 
             println("name")
             var name = it.pathParam("name")
 
             var path = "${devPath}frontend/"
 
-            path += if(name.contains(".") || name.startsWith("monaco")){
+            path += if (name.contains(".") || name.startsWith("monaco")) {
                 name
-            }else{
+            } else {
                 stats.addVisit("/$name")
                 stats.addVisit("/<editor>")
                 "index.html"
             }
-            if(name.endsWith(".css")) {
+            if (name.endsWith(".css")) {
                 println("serving css")
                 it.contentType("text/css")
                 it.header("Content-Type", "text/css")
             }
             println("Serving $path")
             try {
-                if(name == "favicon.ico"){
+                if (name == "favicon.ico") {
                     it.result(File(path).inputStream())
-                }else {
+                } else {
                     var s = "File not found"
-                    
+
                     try {
                         s = Files.readAllLines(File(path).toPath()).joinToString("\n")
-                    }catch(e: java.lang.Exception){
+                    } catch (e: java.lang.Exception) {
                         println("Route not found $path")
                     }
 
-                    if(path.endsWith(".html")){
+                    if (path.endsWith(".html")) {
                         s = s
-                            .replace("%123%", name)
-                            .replace("%url%", url)
-                            .replace("%wsprotocol%", if(ssl || secureWebsocket) "wss" else "ws")
+                                .replace("%123%", name)
+                                .replace("%url%", url)
+                                .replace("%wsprotocol%", if (ssl || secureWebsocket) "wss" else "ws")
                     }
                     it.html(s)
                 }
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
 
         app.ws("/websocket/:path") { ws ->
             ws.onConnect { session ->
-                if(map[session.docId] == null){
+                if (map[session.docId] == null) {
                     map[session.docId] = Editor(session.docId)
                 }
                 session.idleTimeout = 1000000
@@ -277,7 +280,7 @@ class Main{
             }
 
             ws.onMessage { session, message ->
-                if(!message.startsWith("ping"))
+                if (!message.startsWith("ping"))
                     println("Received: $message")
 
 
@@ -286,10 +289,10 @@ class Main{
             ws.onClose { session, statusCode, reason ->
                 println("Closed because: $reason")
                 var sum = map.values.map { it.connections.size }.sum()
-                map.values.map { it.connections().removeAll{x -> x.ws.id == session.id} }
+                map.values.map { it.connections().removeAll { x -> x.ws.id == session.id } }
                 var sumAfter = map.values.map { it.connections().size }.sum()
                 sumAfter = sum - sumAfter
-                if(sumAfter != 1){
+                if (sumAfter != 1) {
                     println("Removal of connection failed: $sumAfter")
                 }
             }
@@ -298,13 +301,13 @@ class Main{
 
         println("Init complete")
 
-        while(true){
+        while (true) {
             var s = readLine()
-            if(s != null){
-                if(s!!.startsWith("s")){
+            if (s != null) {
+                if (s!!.startsWith("s")) {
                     saveEditors()
                 }
-            }else{
+            } else {
                 break
             }
         }
@@ -317,9 +320,9 @@ class Main{
             println("filedata")
             var f = File(writingPath + filename)
 
-            if(!f.exists()) {
+            if (!f.exists()) {
                 it.result("File ${it.pathParam("name")} not found on our server - go back and try again. \nIf the problem persists contact us")
-            }else {
+            } else {
                 it.result(f.inputStream())
                 it.header("Content-Type", "application/download")
                 it.header("Content-Description", "File Transfer")
@@ -328,7 +331,9 @@ class Main{
                 it.header("Content-Disposition", "attachment; filename=${name.substring(name.indexOf('_') + 1)}")
             }
 
-        }catch(e: Throwable){e.printStackTrace()}
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
     }
 
     private fun getSslContextFactory(): SslContextFactory {
@@ -344,11 +349,11 @@ class Main{
     fun extractFrontend(path: String) {
 
         var root = File(userdir() + "/" + path)
-        if(root.isDirectory && root.exists()){
+        if (root.isDirectory && root.exists()) {
 
             var versionfile = File(root.path + "/frontend.version")
 
-            if(versionfile.exists()) {
+            if (versionfile.exists()) {
                 var version = versionfile.readLines().joinToString()
 
                 if (version.equals(frontend_version)) {
@@ -357,7 +362,7 @@ class Main{
                     println("New version detected: Switching frontend from $version to $frontend_version")
                     root.deleteRecursively()
                 }
-            }else{
+            } else {
                 versionfile.writeText(frontend_version)
             }
         }
@@ -371,11 +376,11 @@ class Main{
                 val name = entries.nextElement().name
                 if (name.startsWith("$path/")) { //filter according to the path
                     var split = name.split("/")
-                    if(split[split.lastIndex].contains(".")){
+                    if (split[split.lastIndex].contains(".")) {
                         var inst = Main::class.java.getResourceAsStream(name)
                         println("extracting $name...")
-                        var f =  File(userdir() + "/" + name)
-                        if(!f.parentFile.exists())
+                        var f = File(userdir() + "/" + name)
+                        if (!f.parentFile.exists())
                             f.parentFile.mkdirs()
                         f.createNewFile()
                         f.writeBytes(BufferedInputStream(inst).readBytes())
@@ -409,7 +414,7 @@ class Main{
 
     val savePath = userdir() + "/data/save.csv"
 
-    fun saveEditors(){
+    fun saveEditors() {
 
         var adapter = Moshi.Builder().build().adapter<Editor>(Editor::class.java)
         var arr = map.values.map { adapter.toJson(it) }.toJsonArray()
@@ -420,7 +425,7 @@ class Main{
 
     }
 
-    fun loadEditors(){
+    fun loadEditors() {
 
         map.clear()
 
@@ -428,7 +433,7 @@ class Main{
 
         var file = File(savePath)
 
-        if(file.exists()) {
+        if (file.exists()) {
 
             var s = file.readLines().joinToString()
 
@@ -437,20 +442,20 @@ class Main{
                 map[it.name] = it
 
                 var fileDirectory = File(writingPath)
-                if(!fileDirectory.exists())
+                if (!fileDirectory.exists())
                     fileDirectory.mkdirs()
                 fileDirectory.listFiles { f -> f.name.startsWith(it.name) }
                         .map { f -> AttachedFile(f.absolutePath, path + f.name, f.name.substring(it.name.length + 1)) }
-                        .forEach{ f -> it.files().add(f)}
+                        .forEach { f -> it.files().add(f) }
 
             }
         }
     }
 
     fun Iterable<String>.toJsonArray() =
-        "[${this.joinToString(", ")}]"
+            "[${this.joinToString(", ")}]"
 
-    private fun userdir() : String = System.getProperty("user.dir")!!
+    private fun userdir(): String = System.getProperty("user.dir")!!
 
     val WsSession.docId: String get() = this.pathParam("path")
 
