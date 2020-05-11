@@ -82,7 +82,7 @@ class Main{
 
         Thread{
             while(true){
-                Thread.sleep(100000L)
+                Thread.sleep(5000L) //100000L
                 saveEditors()
             }
         }
