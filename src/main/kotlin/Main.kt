@@ -85,7 +85,7 @@ class Main{
                 Thread.sleep(5000L) //100000L
                 saveEditors()
             }
-        }
+        }.start()
 //        GlobalScope.launch { TODO
 //            while(true){
 //                delay(100000L)
