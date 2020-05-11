@@ -82,7 +82,7 @@ class Main{
 
         Thread{
             while(true){
-                Thread.sleep(5000L) //100000L
+                Thread.sleep(100000L)
                 saveEditors()
             }
         }.start()
@@ -407,12 +407,14 @@ class Main{
 //        }
     }
 
-    val savePath = userdir() + "/save.csv"
+    val savePath = userdir() + "/data/save.csv"
 
     fun saveEditors(){
 
         var adapter = Moshi.Builder().build().adapter<Editor>(Editor::class.java)
-        var arr = map.values.map { adapter.toJson(it) }.map { println(it); it }.toJsonArray()
+        var arr = map.values.map { adapter.toJson(it) }.toJsonArray()
+
+        println("Saved ${arr.length} editors")
 
         File(savePath).writeText(arr)
 
