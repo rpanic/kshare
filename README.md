@@ -6,7 +6,7 @@
 - built-in [monaco](https://microsoft.github.io/monaco-editor/) editor
 - easy-to-use file upload [api](https://github.com/rpanic/kshare/wiki/File-Upload-API-Documentation)
 
-A running instance of kShare can be used at [rpanic.com](rpanic.com)
+A running instance of kShare can be used at [rpanic.com](https://rpanic.com)
 
 [![Build Status](https://drone.rpanic.com/api/badges/rpanic/kshare/status.svg)](https://drone.rpanic.com/rpanic/kshare)
 
@@ -36,7 +36,7 @@ If you want to compile it yourself you will have to download the [monaco editor]
 After executing, kshare will extract the necessary static files to the folder `frontend/`
 
 You will have to pass your url as an argument, for example:\
-`... -url shr.io`
+`... -url myurl.com`
     
 The default port is 80, but can be changed by the port argument\
 `... -port 80`
