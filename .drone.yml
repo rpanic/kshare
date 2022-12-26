@@ -10,15 +10,6 @@ steps:
 - name: build
   commands:
   - docker build -t kshare .
-- name: cleanup
-  commands:
-  - docker stop kshare || true
-  - docker rm kshare || true
-- name: deploy
-  commands:
-  - docker volume create ksharevolume || true
-  - docker volume create ksharefrontend || true
-  - docker run -d --name kshare -v ksharevolume:/app/data -v ksharefrontend:/app/frontend -p 95:95 kshare
   
 trigger:
   branch:
